@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/xampp/htdocs/CALLING_CARD/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
