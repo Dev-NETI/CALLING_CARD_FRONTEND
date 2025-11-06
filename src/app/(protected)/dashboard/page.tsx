@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useAuth } from '@/app/context/AuthContext';
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import Link from 'next/link';
+import { useAuth } from "@/app/context/AuthContext";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
