@@ -192,7 +192,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                   </div>
                 )}
 
-                {employee.company?.address && (
+                {employee.company?.company_address && (
                   <div className="flex items-center bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-4">
                     <svg
                       className="w-6 h-6 mr-3 flex-shrink-0"
@@ -213,7 +213,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                       />
                     </svg>
-                    <span>{employee.company.address}</span>
+                    <span>{employee.company.company_address}</span>
                   </div>
                 )}
               </div>
