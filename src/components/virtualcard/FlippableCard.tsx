@@ -56,7 +56,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
               <div className="relative w-full h-full max-w-[200px] sm:max-w-[300px] md:max-w-[400px]">
                 <Image
                   src={"/assets/logo/" + employee.company?.company_logo}
-                  alt={employee.company?.company_logo}
+                  alt={employee.company?.company_logo || 'Company Logo'}
                   fill
                   className="object-contain"
                 />
@@ -161,7 +161,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
               <div className="relative w-full h-full max-w-[200px] sm:max-w-[300px] md:max-w-[400px]">
                 <Image
                   src={"/assets/logo/" + employee.company?.company_logo}
-                  alt={employee.company?.company_logo}
+                  alt={employee.company?.company_logo || 'Company Logo'}
                   width={500}
                   height={500}
                   className="object-contain"
