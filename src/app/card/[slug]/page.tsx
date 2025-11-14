@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { api } from '@/lib/api';
-import { VirtualCard } from '@/types';
-import Button from '@/components/ui/Button';
-import FlippableCard from '@/components/virtualcard/FlippableCard';
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { api } from "@/lib/api";
+import { VirtualCard } from "@/types";
+import Button from "@/components/ui/Button";
+import FlippableCard from "@/components/virtualcard/FlippableCard";
 
 export default function PublicCardPage() {
   const params = useParams();
@@ -24,8 +24,9 @@ export default function PublicCardPage() {
       setIsLoading(true);
       const data = await api.getVirtualCard(slug);
       setCard(data);
+      console.log(data);
     } catch (error) {
-      setError('Virtual card not found');
+      setError("Virtual card not found");
     } finally {
       setIsLoading(false);
     }
@@ -42,22 +43,26 @@ export default function PublicCardPage() {
 
     const vcard = `BEGIN:VCARD
 VERSION:3.0
-FN:${card.employee.first_name} ${card.employee.middle_name || ''} ${card.employee.last_name}
-N:${card.employee.last_name};${card.employee.first_name};${card.employee.middle_name || ''};;
+FN:${card.employee.first_name} ${card.employee.middle_name || ""} ${
+      card.employee.last_name
+    }
+N:${card.employee.last_name};${card.employee.first_name};${
+      card.employee.middle_name || ""
+    };;
 TITLE:${card.employee.position}
-ORG:${card.employee.company?.company_name || ''}
+ORG:${card.employee.company?.company_name || ""}
 EMAIL:${card.employee.email}
-TEL:${card.employee.mobile_number || ''}
-${card.facebook_url ? `URL;type=Facebook:${card.facebook_url}` : ''}
-${card.linkedin_url ? `URL;type=LinkedIn:${card.linkedin_url}` : ''}
-${card.twitter_url ? `URL;type=Twitter:${card.twitter_url}` : ''}
-${card.instagram_url ? `URL;type=Instagram:${card.instagram_url}` : ''}
-NOTE:${card.bio || ''}
+TEL:${card.employee.mobile_number || ""}
+${card.facebook_url ? `URL;type=Facebook:${card.facebook_url}` : ""}
+${card.linkedin_url ? `URL;type=LinkedIn:${card.linkedin_url}` : ""}
+${card.twitter_url ? `URL;type=Twitter:${card.twitter_url}` : ""}
+${card.instagram_url ? `URL;type=Instagram:${card.instagram_url}` : ""}
+NOTE:${card.bio || ""}
 END:VCARD`;
 
-    const blob = new Blob([vcard], { type: 'text/vcard' });
+    const blob = new Blob([vcard], { type: "text/vcard" });
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = `${card.employee.first_name}_${card.employee.last_name}.vcf`;
     document.body.appendChild(link);
@@ -94,7 +99,9 @@ END:VCARD`;
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Card Not Found</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Card Not Found
+          </h2>
           <p className="text-gray-600">
             The virtual calling card you're looking for doesn't exist.
           </p>
@@ -164,11 +171,9 @@ END:VCARD`;
 
         <FlippableCard card={card} />
 
-        <div className="mt-8 text-center text-gray-600">
-          <p className="text-sm">
-            Powered by Virtual Calling Card System &copy; 2025
-          </p>
-        </div>
+        {/* <div className="mt-8 text-center text-gray-600">
+          <p className="text-sm"></p>
+        </div> */}
       </div>
     </div>
   );

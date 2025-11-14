@@ -257,6 +257,13 @@ class ApiClient {
     return this.handleResponse<VirtualCard>(response);
   }
 
+  async getVirtualCardByEmployeeId(employeeId: number): Promise<VirtualCard> {
+    const response = await fetch(`${API_URL}/employees/${employeeId}/virtual-card`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<VirtualCard>(response);
+  }
+
   async updateVirtualCard(
     employeeId: number,
     data: VirtualCardFormData
