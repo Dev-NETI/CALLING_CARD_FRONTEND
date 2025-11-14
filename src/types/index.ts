@@ -12,6 +12,7 @@ export interface Company {
   company_telephone?: string;
   company_email?: string;
   company_website?: string;
+  company_logo?: string;
   logo_url?: string;
   created_at: string;
   updated_at: string;
