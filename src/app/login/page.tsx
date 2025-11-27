@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAuth } from '@/app/context/AuthContext';
-import { useToast } from '@/components/ui/Toast';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
-import Link from 'next/link';
+import { useState } from "react";
+import { useAuth } from "@/app/context/AuthContext";
+import { useToast } from "@/components/ui/Toast";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Link from "next/link";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('sean@gmail.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState("sean@gmail.com");
+  const [password, setPassword] = useState("password123");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { showToast } = useToast();
@@ -20,11 +20,13 @@ export default function LoginPage() {
 
     try {
       await login({ email, password });
-      showToast('Login successful!', 'success');
+      showToast("Login successful!", "success");
     } catch (error) {
       showToast(
-        error instanceof Error ? error.message : 'Login failed. Please try again.',
-        'error'
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again.",
+        "error"
       );
     } finally {
       setIsLoading(false);
@@ -53,9 +55,7 @@ export default function LoginPage() {
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome Back
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome</h1>
             <p className="text-gray-600">
               Sign in to your Virtual Calling Card account
             </p>
@@ -106,7 +106,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              Don't have an account?{' '}
+              Don't have an account?{" "}
               <Link
                 href="/register"
                 className="text-blue-600 hover:text-blue-700 font-medium"

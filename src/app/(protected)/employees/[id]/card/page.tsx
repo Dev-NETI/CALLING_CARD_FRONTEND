@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import { useParams } from 'next/navigation';
-import { useToast } from '@/components/ui/Toast';
-import { api } from '@/lib/api';
-import { Employee, VirtualCard, VirtualCardFormData } from '@/types';
-import Button from '@/components/ui/Button';
-import FlippableCard from '@/components/virtualcard/FlippableCard';
-import Link from 'next/link';
+import { useState, useEffect, useMemo } from "react";
+import { useParams } from "next/navigation";
+import { useToast } from "@/components/ui/Toast";
+import { api } from "@/lib/api";
+import { Employee, VirtualCard, VirtualCardFormData } from "@/types";
+import Button from "@/components/ui/Button";
+import FlippableCard from "@/components/virtualcard/FlippableCard";
+import Link from "next/link";
 
 export default function VirtualCardPage() {
   const params = useParams();
@@ -18,12 +18,12 @@ export default function VirtualCardPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [formData, setFormData] = useState<VirtualCardFormData>({
-    bio: '',
-    theme_color: '#6366f1',
-    facebook_url: '',
-    linkedin_url: '',
-    twitter_url: '',
-    instagram_url: '',
+    bio: "",
+    theme_color: "#6366f1",
+    facebook_url: "",
+    linkedin_url: "",
+    twitter_url: "",
+    instagram_url: "",
   });
   const { showToast } = useToast();
 
@@ -44,19 +44,19 @@ export default function VirtualCardPage() {
         setCard(cardData);
         // Populate form with existing card data
         setFormData({
-          bio: cardData.bio || '',
-          theme_color: cardData.theme_color || '#6366f1',
-          facebook_url: cardData.facebook_url || '',
-          linkedin_url: cardData.linkedin_url || '',
-          twitter_url: cardData.twitter_url || '',
-          instagram_url: cardData.instagram_url || '',
+          bio: cardData.bio || "",
+          theme_color: cardData.theme_color || "#6366f1",
+          facebook_url: cardData.facebook_url || "",
+          linkedin_url: cardData.linkedin_url || "",
+          twitter_url: cardData.twitter_url || "",
+          instagram_url: cardData.instagram_url || "",
         });
       } catch (error) {
         // Card doesn't exist yet, that's okay
-        console.log('No existing card found, ready to create new one');
+        console.log("No existing card found, ready to create new one");
       }
     } catch (error) {
-      showToast('Failed to load employee data', 'error');
+      showToast("Failed to load employee data", "error");
     } finally {
       setIsLoading(false);
     }
@@ -71,17 +71,17 @@ export default function VirtualCardPage() {
       if (card) {
         // Update existing card
         result = await api.updateVirtualCard(employeeId, formData);
-        showToast('Virtual card updated successfully!', 'success');
+        showToast("Virtual card updated successfully!", "success");
       } else {
         // Create new card
         result = await api.createVirtualCard(employeeId, formData);
-        showToast('Virtual card created successfully!', 'success');
+        showToast("Virtual card created successfully!", "success");
       }
       setCard(result);
     } catch (error) {
       showToast(
-        error instanceof Error ? error.message : 'Failed to save virtual card',
-        'error'
+        error instanceof Error ? error.message : "Failed to save virtual card",
+        "error"
       );
     } finally {
       setIsSaving(false);
@@ -94,7 +94,7 @@ export default function VirtualCardPage() {
       navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      showToast('URL copied to clipboard!', 'success');
+      showToast("URL copied to clipboard!", "success");
     }
   };
 
@@ -108,7 +108,7 @@ export default function VirtualCardPage() {
     // Create a preview VirtualCard object
     return {
       id: 0,
-      slug: 'preview',
+      slug: "preview",
       employee_id: employee.id,
       employee: employee,
       bio: formData.bio,
@@ -189,10 +189,10 @@ END:VCARD`;
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                {card ? 'Manage Virtual Card' : 'Create Virtual Card'}
+                {card ? "Manage Virtual Card" : "Create Virtual Card"}
               </h2>
               <p className="text-gray-600">
-                {card ? 'Update' : 'Design a'} virtual calling card for{' '}
+                {card ? "Update" : "Design a"} virtual calling card for{" "}
                 <span className="font-semibold">
                   {employee.first_name} {employee.last_name}
                 </span>
@@ -271,7 +271,11 @@ END:VCARD`;
                       View Public Card
                     </Button>
                   </Link>
-                  <Button variant="primary" size="sm" onClick={handleDownloadContact}>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={handleDownloadContact}
+                  >
                     <svg
                       className="w-4 h-4 mr-2 inline-block"
                       fill="none"
@@ -303,44 +307,59 @@ END:VCARD`;
 
             {/* Employee Information Display */}
             <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h4 className="text-sm font-semibold text-gray-700 mb-3">Employee Information</h4>
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                Employee Information
+              </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Name:</span>
                   <span className="font-medium text-gray-900">
-                    {employee.first_name} {employee.middle_name} {employee.last_name}
+                    {employee.first_name} {employee.middle_name}{" "}
+                    {employee.last_name}
                   </span>
                 </div>
                 {employee.department && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Department:</span>
-                    <span className="font-medium text-gray-900">{employee.department}</span>
+                    <span className="font-medium text-gray-900">
+                      {employee.department}
+                    </span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span className="text-gray-600">Position:</span>
-                  <span className="font-medium text-gray-900">{employee.position}</span>
+                  <span className="font-medium text-gray-900">
+                    {employee.position}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Email:</span>
-                  <span className="font-medium text-gray-900">{employee.email}</span>
+                  <span className="font-medium text-gray-900">
+                    {employee.email}
+                  </span>
                 </div>
                 {employee.mobile_number && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Mobile:</span>
-                    <span className="font-medium text-gray-900">{employee.mobile_number}</span>
+                    <span className="font-medium text-gray-900">
+                      {employee.mobile_number}
+                    </span>
                   </div>
                 )}
                 {employee.telephone && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Telephone:</span>
-                    <span className="font-medium text-gray-900">{employee.telephone}</span>
+                    <span className="font-medium text-gray-900">
+                      {employee.telephone}
+                    </span>
                   </div>
                 )}
                 {employee.company && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Company:</span>
-                    <span className="font-medium text-gray-900">{employee.company.company_name}</span>
+                    <span className="font-medium text-gray-900">
+                      {employee.company.company_name}
+                    </span>
                   </div>
                 )}
               </div>
@@ -349,7 +368,7 @@ END:VCARD`;
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="pt-4">
                 <Button type="submit" className="w-full" isLoading={isSaving}>
-                  {card ? 'Update Virtual Card' : 'Generate Virtual Card'}
+                  {card ? "Update Virtual Card" : "Generate Virtual Card"}
                 </Button>
               </div>
             </form>
