@@ -161,7 +161,9 @@ class ApiClient {
         console.error("Employee fetch failed with status:", response.status);
         const errorText = await response.text();
         console.error("Error response:", errorText);
-        throw new Error(`Failed to fetch employees: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch employees: ${response.status} ${response.statusText}`
+        );
       }
 
       const data = await response.json();
@@ -174,13 +176,22 @@ class ApiClient {
         console.log("✓ Response is direct array, length:", data.length);
         return data;
       } else if (data && Array.isArray(data.data)) {
-        console.log("✓ Response has data.data array, length:", data.data.length);
+        console.log(
+          "✓ Response has data.data array, length:",
+          data.data.length
+        );
         return data.data;
       } else if (data && Array.isArray(data.employees)) {
-        console.log("✓ Response has data.employees array, length:", data.employees.length);
+        console.log(
+          "✓ Response has data.employees array, length:",
+          data.employees.length
+        );
         return data.employees;
       } else if (data && data.results && Array.isArray(data.results)) {
-        console.log("✓ Response has data.results array (paginated), length:", data.results.length);
+        console.log(
+          "✓ Response has data.results array (paginated), length:",
+          data.results.length
+        );
         return data.results;
       }
 
@@ -258,9 +269,12 @@ class ApiClient {
   }
 
   async getVirtualCardByEmployeeId(employeeId: number): Promise<VirtualCard> {
-    const response = await fetch(`${API_URL}/employees/${employeeId}/virtual-card`, {
-      headers: this.getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${API_URL}/employees/${employeeId}/virtual-card`,
+      {
+        headers: this.getAuthHeaders(),
+      }
+    );
     return this.handleResponse<VirtualCard>(response);
   }
 
