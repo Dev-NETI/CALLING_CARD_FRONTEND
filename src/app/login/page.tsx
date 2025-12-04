@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { useToast } from "@/components/ui/Toast";
+import { api } from "@/lib/api";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Link from "next/link";
@@ -13,21 +15,39 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { showToast } = useToast();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await login({ email, password });
-      showToast("Login successful!", "success");
+      const response = await api.login({ email, password });
+
+      if (response.requires_verification && response.user_id) {
+        // Redirect to verification page
+        showToast("Verification code sent to your email!", "success");
+        router.push(`/verify?userId=${response.user_id}`);
+      } else if (response.token && response.user) {
+        // Direct login (backwards compatibility)
+        login(response.user, response.token);
+        showToast("Login successful!", "success");
+      }
     } catch (error) {
-      showToast(
-        error instanceof Error
-          ? error.message
-          : "Login failed. Please try again.",
-        "error"
-      );
+      let errorMessage = "Login failed. Please try again.";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+
+        // Provide user-friendly messages for common errors
+        if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
+          errorMessage = "Cannot connect to server. Please check your connection.";
+        } else if (errorMessage.includes("credentials are incorrect") || errorMessage.includes("Unauthenticated")) {
+          errorMessage = "Invalid email or password. Please try again.";
+        }
+      }
+
+      showToast(errorMessage, "error");
     } finally {
       setIsLoading(false);
     }

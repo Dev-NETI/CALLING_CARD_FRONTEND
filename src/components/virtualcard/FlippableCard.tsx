@@ -56,7 +56,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
               <div className="relative w-full h-full max-w-[200px] sm:max-w-[300px] md:max-w-[400px]">
                 <Image
                   src={"/assets/logo/" + employee.company?.company_logo}
-                  alt={employee.company?.company_logo || 'Company Logo'}
+                  alt={employee.company?.company_logo || "Company Logo"}
                   fill
                   className="object-contain"
                 />
@@ -69,7 +69,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                 {/* Name */}
                 <h1
                   className="font-bold text-[#1e3a8a] uppercase break-words leading-tight"
-                  style={{ fontSize: 'clamp(0.75rem, 3.5vw, 2.5rem)' }}
+                  style={{ fontSize: "clamp(0.75rem, 3.5vw, 2.5rem)" }}
                 >
                   {employee.first_name} {middleInitial} {employee.last_name}
                 </h1>
@@ -78,7 +78,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                 {employee.department && (
                   <p
                     className="font-bold text-[#000000] break-words leading-tight"
-                    style={{ fontSize: 'clamp(0.5rem, 2vw, 1.5rem)' }}
+                    style={{ fontSize: "clamp(0.5rem, 2vw, 1.5rem)" }}
                   >
                     {employee.department}
                   </p>
@@ -87,7 +87,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                 {/* Position */}
                 <p
                   className="font-bold text-[#000000] break-words leading-tight"
-                  style={{ fontSize: 'clamp(0.5rem, 2vw, 1.5rem)' }}
+                  style={{ fontSize: "clamp(0.5rem, 2vw, 1.5rem)" }}
                 >
                   {employee.position}
                 </p>
@@ -101,7 +101,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                   {employee.telephone && (
                     <p
                       className="break-words leading-tight"
-                      style={{ fontSize: 'clamp(0.4rem, 1.2vw, 1rem)' }}
+                      style={{ fontSize: "clamp(0.4rem, 1.2vw, 1rem)" }}
                     >
                       Tel : {employee.telephone}
                     </p>
@@ -109,14 +109,14 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                   {employee.mobile_number && (
                     <p
                       className="break-words leading-tight"
-                      style={{ fontSize: 'clamp(0.4rem, 1.2vw, 1rem)' }}
+                      style={{ fontSize: "clamp(0.4rem, 1.2vw, 1rem)" }}
                     >
                       Mobile : {employee.mobile_number}
                     </p>
                   )}
                   <p
                     className="break-words leading-tight"
-                    style={{ fontSize: 'clamp(0.4rem, 1.2vw, 1rem)' }}
+                    style={{ fontSize: "clamp(0.4rem, 1.2vw, 1rem)" }}
                   >
                     Email :{employee.email}
                   </p>
@@ -128,8 +128,8 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                 <div
                   className="relative"
                   style={{
-                    width: 'clamp(3rem, 8vw, 8rem)',
-                    height: 'clamp(3rem, 8vw, 8rem)',
+                    width: "clamp(3rem, 8vw, 8rem)",
+                    height: "clamp(3rem, 8vw, 8rem)",
                   }}
                 >
                   {/* Placeholder for ISO certification logo */}
@@ -161,7 +161,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
               <div className="relative w-full h-full max-w-[200px] sm:max-w-[300px] md:max-w-[400px]">
                 <Image
                   src={"/assets/logo/" + employee.company?.company_logo}
-                  alt={employee.company?.company_logo || 'Company Logo'}
+                  alt={employee.company?.company_logo || "Company Logo"}
                   width={500}
                   height={500}
                   className="object-contain"
@@ -175,7 +175,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                 <div className="text-[#000000]">
                   <p
                     className="break-words font-bold leading-tight"
-                    style={{ fontSize: 'clamp(0.5rem, 2vw, 1.5rem)' }}
+                    style={{ fontSize: "clamp(0.5rem, 2vw, 1.5rem)" }}
                   >
                     {employee.company.company_address}
                   </p>
@@ -186,7 +186,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                 {employee.company?.company_telephone && (
                   <p
                     className="break-words leading-tight"
-                    style={{ fontSize: 'clamp(0.4rem, 1.2vw, 1rem)' }}
+                    style={{ fontSize: "clamp(0.4rem, 1.2vw, 1rem)" }}
                   >
                     Tel: {employee.company.company_telephone}
                   </p>
@@ -198,7 +198,7 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                 {employee.company?.company_website && (
                   <p
                     className="break-words leading-tight"
-                    style={{ fontSize: 'clamp(0.4rem, 1.2vw, 1rem)' }}
+                    style={{ fontSize: "clamp(0.4rem, 1.2vw, 1rem)" }}
                   >
                     Website: {employee.company.company_website}
                   </p>
@@ -210,13 +210,13 @@ export default function FlippableCard({ card }: FlippableCardProps) {
                 <div
                   className="relative"
                   style={{
-                    width: 'clamp(4rem, 10vw, 12rem)',
-                    height: 'clamp(4rem, 10vw, 12rem)',
+                    width: "clamp(4rem, 10vw, 12rem)",
+                    height: "clamp(4rem, 10vw, 12rem)",
                   }}
                 >
                   <Image
                     src={"/assets/certifications/sail_green.png"}
-                    alt={employee.company?.company_logo || 'Sail Green'}
+                    alt={employee.company?.company_logo || "Sail Green"}
                     fill
                     className="object-contain"
                   />

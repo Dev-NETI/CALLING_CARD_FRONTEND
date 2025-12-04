@@ -58,6 +58,23 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface LoginResponse {
+  message: string;
+  requires_verification?: boolean;
+  user_id?: number;
+  user?: User;
+  token?: string;
+}
+
+export interface VerifyCodeRequest {
+  user_id: number;
+  code: string;
+}
+
+export interface ResendCodeRequest {
+  user_id: number;
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;

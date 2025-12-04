@@ -4,6 +4,9 @@ import {
   Employee,
   VirtualCard,
   AuthResponse,
+  LoginResponse,
+  VerifyCodeRequest,
+  ResendCodeRequest,
   LoginCredentials,
   RegisterData,
   CompanyFormData,
@@ -28,7 +31,18 @@ class ApiClient {
 
       try {
         const error = await response.json();
-        errorMessage = error.message || error.detail || errorMessage;
+
+        // Handle Laravel validation errors
+        if (error.errors) {
+          // Get first error from validation errors object
+          const firstErrorKey = Object.keys(error.errors)[0];
+          const firstError = error.errors[firstErrorKey];
+          errorMessage = Array.isArray(firstError) ? firstError[0] : firstError;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else if (error.detail) {
+          errorMessage = error.detail;
+        }
 
         // Log the full error for debugging
         console.error("API Error Response:", {
@@ -55,13 +69,31 @@ class ApiClient {
     return this.handleResponse<AuthResponse>(response);
   }
 
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  async login(credentials: LoginCredentials): Promise<LoginResponse> {
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
+    return this.handleResponse<LoginResponse>(response);
+  }
+
+  async verifyCode(data: VerifyCodeRequest): Promise<AuthResponse> {
+    const response = await fetch(`${API_URL}/verify-code`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
     return this.handleResponse<AuthResponse>(response);
+  }
+
+  async resendCode(data: ResendCodeRequest): Promise<{ message: string }> {
+    const response = await fetch(`${API_URL}/resend-code`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return this.handleResponse<{ message: string }>(response);
   }
 
   async logout(): Promise<void> {
@@ -246,18 +278,12 @@ class ApiClient {
   }
 
   // Virtual Card endpoints
-  async createVirtualCard(
-    employeeId: number,
-    data: VirtualCardFormData
-  ): Promise<VirtualCard> {
-    const response = await fetch(
-      `${API_URL}/employees/${employeeId}/virtual-card`,
-      {
-        method: "POST",
-        headers: this.getAuthHeaders(),
-        body: JSON.stringify(data),
-      }
-    );
+  async createVirtualCard(data: VirtualCardFormData): Promise<VirtualCard> {
+    const response = await fetch(`${API_URL}/employees/virtual-card`, {
+      method: "POST",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
     return this.handleResponse<VirtualCard>(response);
   }
 
@@ -270,7 +296,7 @@ class ApiClient {
 
   async getVirtualCardByEmployeeId(employeeId: number): Promise<VirtualCard> {
     const response = await fetch(
-      `${API_URL}/employees/${employeeId}/virtual-card`,
+      `${API_URL}/employees/virtual-card/${employeeId}`,
       {
         headers: this.getAuthHeaders(),
       }
@@ -278,18 +304,12 @@ class ApiClient {
     return this.handleResponse<VirtualCard>(response);
   }
 
-  async updateVirtualCard(
-    employeeId: number,
-    data: VirtualCardFormData
-  ): Promise<VirtualCard> {
-    const response = await fetch(
-      `${API_URL}/employees/${employeeId}/virtual-card`,
-      {
-        method: "PUT",
-        headers: this.getAuthHeaders(),
-        body: JSON.stringify(data),
-      }
-    );
+  async updateVirtualCard(data: VirtualCardFormData): Promise<VirtualCard> {
+    const response = await fetch(`${API_URL}/employees/virtual-card`, {
+      method: "PUT",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
     return this.handleResponse<VirtualCard>(response);
   }
 }

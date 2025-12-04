@@ -35,10 +35,20 @@ export default function RegisterPage() {
       await register({ name, email, password });
       showToast('Registration successful!', 'success');
     } catch (error) {
-      showToast(
-        error instanceof Error ? error.message : 'Registration failed. Please try again.',
-        'error'
-      );
+      let errorMessage = 'Registration failed. Please try again.';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+
+        // Provide user-friendly messages for common errors
+        if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+          errorMessage = 'Cannot connect to server. Please check your connection.';
+        } else if (errorMessage.includes('already been taken') || errorMessage.includes('unique')) {
+          errorMessage = 'This email is already registered. Please use a different email.';
+        }
+      }
+
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }

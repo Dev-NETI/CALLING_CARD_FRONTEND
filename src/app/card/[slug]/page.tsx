@@ -114,7 +114,7 @@ END:VCARD`;
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 flex justify-end gap-3">
-          <Button variant="outline" size="sm" onClick={handleCopyUrl}>
+          {/* <Button variant="outline" size="sm" onClick={handleCopyUrl}>
             {copied ? (
               <>
                 <svg
@@ -150,7 +150,7 @@ END:VCARD`;
                 Share
               </>
             )}
-          </Button>
+          </Button> */}
           <Button variant="primary" size="sm" onClick={handleDownloadContact}>
             <svg
               className="w-4 h-4 mr-2 inline-block"
