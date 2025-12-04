@@ -42,7 +42,10 @@ export default function EmployeeListComponent({
 
     try {
       setIsLoading(true);
-      console.log("Fetching employees with token:", token ? "Token exists" : "No token");
+      console.log(
+        "Fetching employees with token:",
+        token ? "Token exists" : "No token"
+      );
 
       const [employeesData, companiesData] = await Promise.all([
         api.getEmployees(),
@@ -70,7 +73,11 @@ export default function EmployeeListComponent({
         error instanceof Error ? error.message : "Failed to load data";
 
       // Check if it's an authentication error
-      if (errorMessage.includes("401") || errorMessage.includes("Unauthorized") || errorMessage.includes("authentication")) {
+      if (
+        errorMessage.includes("401") ||
+        errorMessage.includes("Unauthorized") ||
+        errorMessage.includes("authentication")
+      ) {
         showToast("Session expired. Please login again.", "error");
         setTimeout(() => logout(), 2000);
       } else {

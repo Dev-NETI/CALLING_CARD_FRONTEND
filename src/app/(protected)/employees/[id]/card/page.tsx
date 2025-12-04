@@ -68,13 +68,18 @@ export default function VirtualCardPage() {
 
     try {
       let result;
+      const dataToSubmit = {
+        ...formData,
+        employee_id: employeeId,
+      };
+
       if (card) {
         // Update existing card
-        result = await api.updateVirtualCard(employeeId, formData);
+        result = await api.updateVirtualCard(dataToSubmit);
         showToast("Virtual card updated successfully!", "success");
       } else {
         // Create new card
-        result = await api.createVirtualCard(employeeId, formData);
+        result = await api.createVirtualCard(dataToSubmit);
         showToast("Virtual card created successfully!", "success");
       }
       setCard(result);
