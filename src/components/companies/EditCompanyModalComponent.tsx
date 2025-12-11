@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Modal from "@/components/ui/Modal";
 import Input from "@/components/ui/Input";
+import Checkbox from "@/components/ui/Checkbox";
 import Button from "@/components/ui/Button";
 import { Company, CompanyFormData } from "@/types";
 import { api } from "@/lib/api";
@@ -27,6 +28,7 @@ export default function EditCompanyModalComponent({
     company_telephone: "",
     company_email: "",
     company_website: "",
+    has_bcard: false,
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -40,6 +42,7 @@ export default function EditCompanyModalComponent({
         company_telephone: company.company_telephone || "",
         company_email: company.company_email || "",
         company_website: company.company_website || "",
+        has_bcard: company.has_bcard || false,
       });
     }
   }, [company]);
@@ -51,6 +54,7 @@ export default function EditCompanyModalComponent({
       company_telephone: "",
       company_email: "",
       company_website: "",
+      has_bcard: false,
     });
     onClose();
   };
@@ -120,6 +124,14 @@ export default function EditCompanyModalComponent({
             setFormData({ ...formData, company_address: e.target.value })
           }
           placeholder="Company address"
+        />
+        <Checkbox
+          label="Has Business Card"
+          description="Check if this company has a business card"
+          checked={formData.has_bcard}
+          onChange={(e) =>
+            setFormData({ ...formData, has_bcard: e.target.checked })
+          }
         />
         <div className="flex gap-3 pt-4">
           <Button

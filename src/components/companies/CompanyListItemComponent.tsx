@@ -23,6 +23,41 @@ export default function CompanyListItemComponent({
             {company.company_name.charAt(0).toUpperCase()}
           </span>
         </div>
+        {company.has_bcard ? (
+          <span className="px-2.5 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full flex items-center gap-1">
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Business Card
+          </span>
+        ) : (
+          <span className="px-2.5 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full flex items-center gap-1">
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            Business Card
+          </span>
+        )}
       </div>
       <h3 className="text-xl font-semibold text-gray-900 mb-3">
         {company.company_name}

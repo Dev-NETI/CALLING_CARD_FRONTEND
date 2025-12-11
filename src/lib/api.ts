@@ -287,11 +287,11 @@ class ApiClient {
     return this.handleResponse<VirtualCard>(response);
   }
 
-  async getVirtualCard(slug: string): Promise<VirtualCard> {
-    const response = await fetch(`${API_URL}/cards/${slug}`, {
+  async getVirtualCard(employeeId: number): Promise<Employee> {
+    const response = await fetch(`${API_URL}/cards/${employeeId}`, {
       headers: { "Content-Type": "application/json" },
     });
-    return this.handleResponse<VirtualCard>(response);
+    return this.handleResponse<Employee>(response);
   }
 
   async getVirtualCardByEmployeeId(employeeId: number): Promise<VirtualCard> {
@@ -311,6 +311,14 @@ class ApiClient {
       body: JSON.stringify(data),
     });
     return this.handleResponse<VirtualCard>(response);
+  }
+
+  // Dashboard Stats
+  async getDashboardStats(): Promise<{ total_companies: number; total_employees: number }> {
+    const response = await fetch(`${API_URL}/dashboard/stats`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<{ total_companies: number; total_employees: number }>(response);
   }
 }
 

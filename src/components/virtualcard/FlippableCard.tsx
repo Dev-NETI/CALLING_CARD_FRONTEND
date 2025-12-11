@@ -1,16 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { VirtualCard } from "@/types";
+import { Employee } from "@/types";
 import Image from "next/image";
 
 interface FlippableCardProps {
-  card: VirtualCard;
+  employee: Employee;
 }
 
-export default function FlippableCard({ card }: FlippableCardProps) {
+export default function FlippableCard({ employee }: FlippableCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
-  const employee = card.employee;
 
   if (!employee) return null;
 
