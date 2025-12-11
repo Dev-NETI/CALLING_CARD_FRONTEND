@@ -1,11 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { Employee } from "@/types";
 
 interface EmployeeListItemProps {
   employee: Employee;
   companyName: string;
+  companyHasBcard: boolean;
   onEdit: (employee: Employee) => void;
   onDelete: (id: number) => void;
   onCreateCard: (employeeId: number) => void;
@@ -14,10 +16,17 @@ interface EmployeeListItemProps {
 export default function EmployeeListItemComponent({
   employee,
   companyName,
+  companyHasBcard,
   onEdit,
   onDelete,
   onCreateCard,
 }: EmployeeListItemProps) {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    router.push(`/card/${employee.id}`);
+  };
+
   return (
     <tr className="hover:bg-gray-50">
       <td className="px-6 py-4 whitespace-nowrap">
@@ -70,18 +79,12 @@ export default function EmployeeListItemComponent({
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <div className="flex justify-end gap-2">
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => onCreateCard(employee.id)}
-          >
-            Card
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(employee)}
-          >
+          {companyHasBcard && (
+            <Button variant="primary" size="sm" onClick={handleCardClick}>
+              Card
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={() => onEdit(employee)}>
             Edit
           </Button>
           <Button

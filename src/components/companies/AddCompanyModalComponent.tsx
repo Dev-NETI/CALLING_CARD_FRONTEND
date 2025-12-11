@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import Input from "@/components/ui/Input";
+import Checkbox from "@/components/ui/Checkbox";
 import Button from "@/components/ui/Button";
 import { CompanyFormData } from "@/types";
 import { api } from "@/lib/api";
@@ -25,6 +26,7 @@ export default function AddCompanyModalComponent({
     company_telephone: "",
     company_email: "",
     company_website: "",
+    has_bcard: false,
   });
   const [isSaving, setIsSaving] = useState(false);
   const { showToast } = useToast();
@@ -36,6 +38,7 @@ export default function AddCompanyModalComponent({
       company_telephone: "",
       company_email: "",
       company_website: "",
+      has_bcard: false,
     });
     onClose();
   };
@@ -109,6 +112,14 @@ export default function AddCompanyModalComponent({
             setFormData({ ...formData, company_address: e.target.value })
           }
           placeholder="Company address"
+        />
+        <Checkbox
+          label="Has Business Card"
+          description="Check if this company has a business card"
+          checked={formData.has_bcard}
+          onChange={(e) =>
+            setFormData({ ...formData, has_bcard: e.target.checked })
+          }
         />
         <div className="flex gap-3 pt-4">
           <Button

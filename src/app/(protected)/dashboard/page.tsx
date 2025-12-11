@@ -1,12 +1,32 @@
 "use client";
 
 import { useAuth } from "@/app/context/AuthContext";
+import { useState, useEffect } from "react";
+import { api } from "@/lib/api";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Link from "next/link";
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
+  const [stats, setStats] = useState({ total_companies: 0, total_employees: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      setIsLoading(true);
+      const data = await api.getDashboardStats();
+      setStats(data);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
@@ -34,11 +54,11 @@ export default function DashboardPage() {
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h2>
           <p className="text-gray-600">
-            Manage your companies, employees, and virtual calling cards
+            Manage your companies and employees
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link href="/companies">
             <Card hover className="cursor-pointer h-full">
               <div className="flex flex-col items-center text-center p-4">
@@ -94,34 +114,6 @@ export default function DashboardPage() {
               </div>
             </Card>
           </Link>
-
-          <Link href="/employees">
-            <Card hover className="cursor-pointer h-full">
-              <div className="flex flex-col items-center text-center p-4">
-                <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full flex items-center justify-center mb-4">
-                  <svg
-                    className="w-8 h-8 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Virtual Cards
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Create and manage virtual calling cards
-                </p>
-              </div>
-            </Card>
-          </Link>
         </div>
 
         <div className="mt-12">
@@ -129,20 +121,23 @@ export default function DashboardPage() {
             <h3 className="text-xl font-semibold text-gray-900 mb-4">
               Quick Stats
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-3xl font-bold text-blue-600">0</p>
-                <p className="text-gray-600 mt-1">Total Companies</p>
+            {isLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-gray-600 mt-2">Loading stats...</p>
               </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <p className="text-3xl font-bold text-purple-600">0</p>
-                <p className="text-gray-600 mt-1">Total Employees</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="text-center p-6 bg-blue-50 rounded-lg">
+                  <p className="text-4xl font-bold text-blue-600">{stats.total_companies}</p>
+                  <p className="text-gray-600 mt-2">Total Companies</p>
+                </div>
+                <div className="text-center p-6 bg-purple-50 rounded-lg">
+                  <p className="text-4xl font-bold text-purple-600">{stats.total_employees}</p>
+                  <p className="text-gray-600 mt-2">Total Employees</p>
+                </div>
               </div>
-              <div className="text-center p-4 bg-pink-50 rounded-lg">
-                <p className="text-3xl font-bold text-pink-600">0</p>
-                <p className="text-gray-600 mt-1">Virtual Cards</p>
-              </div>
-            </div>
+            )}
           </Card>
         </div>
       </div>

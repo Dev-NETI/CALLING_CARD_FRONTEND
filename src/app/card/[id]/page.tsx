@@ -3,30 +3,41 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { api } from "@/lib/api";
-import { VirtualCard } from "@/types";
+import { Employee } from "@/types";
 import Button from "@/components/ui/Button";
 import FlippableCard from "@/components/virtualcard/FlippableCard";
 
 export default function PublicCardPage() {
   const params = useParams();
-  const slug = params.slug as string;
-  const [card, setCard] = useState<VirtualCard | null>(null);
+  const employeeId = parseInt(params.id as string);
+  const [employee, setEmployee] = useState<Employee | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    fetchCard();
-  }, [slug]);
+    if (employeeId) {
+      fetchCard();
+    }
+  }, [employeeId]);
 
   const fetchCard = async () => {
     try {
       setIsLoading(true);
-      const data = await api.getVirtualCard(slug);
-      setCard(data);
+      setError(null);
+      const data = await api.getVirtualCard(employeeId);
+      setEmployee(data);
       console.log(data);
-    } catch (error) {
-      setError("Virtual card not found");
+    } catch (error: any) {
+      // Handle different error types
+      if (error.message?.includes("404")) {
+        setError("Employee not found");
+      } else if (error.message?.includes("403")) {
+        setError("This employee or company is no longer active");
+      } else {
+        setError("Employee not found");
+      }
+      console.error("Error fetching employee:", error);
     } finally {
       setIsLoading(false);
     }
@@ -39,32 +50,23 @@ export default function PublicCardPage() {
   };
 
   const handleDownloadContact = () => {
-    if (!card?.employee) return;
+    if (!employee) return;
 
     const vcard = `BEGIN:VCARD
 VERSION:3.0
-FN:${card.employee.first_name} ${card.employee.middle_name || ""} ${
-      card.employee.last_name
-    }
-N:${card.employee.last_name};${card.employee.first_name};${
-      card.employee.middle_name || ""
-    };;
-TITLE:${card.employee.position}
-ORG:${card.employee.company?.company_name || ""}
-EMAIL:${card.employee.email}
-TEL:${card.employee.mobile_number || ""}
-${card.facebook_url ? `URL;type=Facebook:${card.facebook_url}` : ""}
-${card.linkedin_url ? `URL;type=LinkedIn:${card.linkedin_url}` : ""}
-${card.twitter_url ? `URL;type=Twitter:${card.twitter_url}` : ""}
-${card.instagram_url ? `URL;type=Instagram:${card.instagram_url}` : ""}
-NOTE:${card.bio || ""}
+FN:${employee.first_name} ${employee.middle_name || ""} ${employee.last_name}
+N:${employee.last_name};${employee.first_name};${employee.middle_name || ""};;
+TITLE:${employee.position}
+ORG:${employee.company?.company_name || ""}
+EMAIL:${employee.email}
+TEL:${employee.mobile_number || ""}
 END:VCARD`;
 
     const blob = new Blob([vcard], { type: "text/vcard" });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${card.employee.first_name}_${card.employee.last_name}.vcf`;
+    link.download = `${employee.first_name}_${employee.last_name}.vcf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -82,7 +84,7 @@ END:VCARD`;
     );
   }
 
-  if (error || !card || !card.employee) {
+  if (error || !employee) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
         <div className="bg-white rounded-2xl shadow-2xl p-12 text-center max-w-md">
@@ -100,10 +102,10 @@ END:VCARD`;
             />
           </svg>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Card Not Found
+            {error?.includes("no longer active") ? "Inactive" : "Not Found"}
           </h2>
           <p className="text-gray-600">
-            The virtual calling card you're looking for doesn't exist.
+            {error || "The employee you're looking for doesn't exist."}
           </p>
         </div>
       </div>
@@ -169,7 +171,7 @@ END:VCARD`;
           </Button>
         </div>
 
-        <FlippableCard card={card} />
+        <FlippableCard employee={employee} />
 
         {/* <div className="mt-8 text-center text-gray-600">
           <p className="text-sm"></p>

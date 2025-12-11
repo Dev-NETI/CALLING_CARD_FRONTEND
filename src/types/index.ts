@@ -14,6 +14,7 @@ export interface Company {
   company_website?: string;
   company_logo?: string;
   logo_url?: string;
+  has_bcard?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -36,6 +37,7 @@ export interface Employee {
   created_at: string;
   updated_at: string;
   company?: Company;
+  virtual_card?: VirtualCard;
 }
 
 export interface VirtualCard {
@@ -92,6 +94,7 @@ export interface CompanyFormData {
   company_telephone?: string;
   company_email?: string;
   company_website?: string;
+  has_bcard?: boolean;
 }
 
 export interface EmployeeFormData {
