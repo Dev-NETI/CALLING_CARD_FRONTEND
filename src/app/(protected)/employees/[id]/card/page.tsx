@@ -391,7 +391,9 @@ END:VCARD`;
                 </span>
               )}
             </div>
-            {previewCard && <FlippableCard card={previewCard} />}
+            {previewCard && previewCard.employee && (
+              <FlippableCard employee={previewCard.employee} />
+            )}
           </div>
         </div>
       </div>
