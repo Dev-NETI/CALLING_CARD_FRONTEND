@@ -53,7 +53,6 @@ export default function VirtualCardPage() {
         });
       } catch (error) {
         // Card doesn't exist yet, that's okay
-        console.log("No existing card found, ready to create new one");
       }
     } catch (error) {
       showToast("Failed to load employee data", "error");

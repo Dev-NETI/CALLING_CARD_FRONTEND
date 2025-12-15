@@ -119,13 +119,10 @@ class ApiClient {
   // Company endpoints
   async getCompanies(): Promise<Company[]> {
     try {
-      console.log("Fetching companies from:", `${API_URL}/companies`);
       const response = await fetch(`${API_URL}/companies`, {
         headers: this.getAuthHeaders(),
       });
-      console.log("Get companies response status:", response.status);
       const data = await this.handleResponse<Company[]>(response);
-      console.log("Companies data received:", data);
       return data;
     } catch (error) {
       console.error("Failed to fetch companies:", error);
@@ -141,16 +138,12 @@ class ApiClient {
 
   async createCompany(data: CompanyFormData): Promise<Company> {
     try {
-      console.log("Creating company with data:", data);
-      console.log("API URL:", `${API_URL}/companies`);
-
       const response = await fetch(`${API_URL}/companies`, {
         method: "POST",
         headers: this.getAuthHeaders(),
         body: JSON.stringify(data),
       });
 
-      console.log("Response status:", response.status);
       return this.handleResponse<Company>(response);
     } catch (error) {
       console.error("Failed to create company:", error);
@@ -186,52 +179,29 @@ class ApiClient {
   // Employee endpoints
   async getEmployees(): Promise<Employee[]> {
     try {
-      console.log("Fetching employees from:", `${API_URL}/employees`);
       const response = await fetch(`${API_URL}/employees`, {
         headers: this.getAuthHeaders(),
       });
-      console.log("Get employees response status:", response.status);
 
       if (!response.ok) {
-        console.error("Employee fetch failed with status:", response.status);
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
         throw new Error(
           `Failed to fetch employees: ${response.status} ${response.statusText}`
         );
       }
 
       const data = await response.json();
-      console.log("Parsed employees data:", data);
-      console.log("Data type:", typeof data);
-      console.log("Is array?:", Array.isArray(data));
 
       // Handle different response structures
       if (Array.isArray(data)) {
-        console.log("✓ Response is direct array, length:", data.length);
         return data;
       } else if (data && Array.isArray(data.data)) {
-        console.log(
-          "✓ Response has data.data array, length:",
-          data.data.length
-        );
         return data.data;
       } else if (data && Array.isArray(data.employees)) {
-        console.log(
-          "✓ Response has data.employees array, length:",
-          data.employees.length
-        );
         return data.employees;
       } else if (data && data.results && Array.isArray(data.results)) {
-        console.log(
-          "✓ Response has data.results array (paginated), length:",
-          data.results.length
-        );
         return data.results;
       }
 
-      console.warn("⚠ Unexpected employees response structure:", data);
-      console.warn("Available keys:", data ? Object.keys(data) : "no keys");
       return [];
     } catch (error) {
       console.error("❌ Failed to fetch employees:", error);

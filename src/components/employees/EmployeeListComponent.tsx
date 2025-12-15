@@ -43,38 +43,21 @@ export default function EmployeeListComponent({
   const fetchData = async () => {
     // Verify token exists before making requests
     if (!token) {
-      console.error("No authentication token found");
       showToast("Authentication required. Please login again.", "error");
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log(
-        "Fetching employees with token:",
-        token ? "Token exists" : "No token"
-      );
 
       const [employeesData, companiesData] = await Promise.all([
         api.getEmployees(),
         api.getCompanies(),
       ]);
 
-      console.log("=== EMPLOYEES DATA DEBUG ===");
-      console.log("Raw employeesData:", employeesData);
-      console.log("Is Array?", Array.isArray(employeesData));
-      console.log("Type:", typeof employeesData);
-      console.log("Length:", employeesData?.length);
-      console.log("===========================");
-
       // Ensure we always have arrays
       setEmployees(Array.isArray(employeesData) ? employeesData : []);
       setCompanies(Array.isArray(companiesData) ? companiesData : []);
-
-      console.log(
-        "Employees set to state:",
-        Array.isArray(employeesData) ? employeesData : []
-      );
     } catch (error) {
       console.error("Error fetching data:", error);
       const errorMessage =

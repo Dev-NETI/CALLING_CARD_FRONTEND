@@ -79,7 +79,7 @@ export default function EditCompanyModalComponent({
       setIsSaving(false);
     }
   };
-  console.log(formData);
+
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Edit Company" size="lg">
       <form onSubmit={handleSubmit} className="space-y-4">
