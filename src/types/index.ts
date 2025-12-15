@@ -1,8 +1,29 @@
+export interface Permission {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Role {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  permissions?: Permission[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface User {
   id: number;
   name: string;
   email: string;
+  roles?: Role[];
   created_at: string;
+  updated_at: string;
 }
 
 export interface Company {
@@ -119,4 +140,21 @@ export interface VirtualCardFormData {
   linkedin_url?: string;
   twitter_url?: string;
   instagram_url?: string;
+}
+
+export interface UserFormData {
+  name: string;
+  email: string;
+  password?: string;
+  role_ids?: number[];
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  current_page: number;
+  from: number;
+  last_page: number;
+  per_page: number;
+  to: number;
+  total: number;
 }
