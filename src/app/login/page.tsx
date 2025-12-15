@@ -35,25 +35,6 @@ export default function LoginPage() {
       }
     } catch (error) {
       let errorMessage = "Login failed. Please try again.";
-
-      if (error instanceof Error) {
-        errorMessage = error.message;
-
-        // Provide user-friendly messages for common errors
-        if (
-          errorMessage.includes("Failed to fetch") ||
-          errorMessage.includes("NetworkError")
-        ) {
-          errorMessage =
-            "Cannot connect to server. Please check your connection.";
-        } else if (
-          errorMessage.includes("credentials are incorrect") ||
-          errorMessage.includes("Unauthenticated")
-        ) {
-          errorMessage = "Invalid email or password. Please try again.";
-        }
-      }
-
       showToast(errorMessage, "error");
     } finally {
       setIsLoading(false);

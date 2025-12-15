@@ -317,11 +317,17 @@ class ApiClient {
   }
 
   // Dashboard Stats
-  async getDashboardStats(): Promise<{ total_companies: number; total_employees: number }> {
+  async getDashboardStats(): Promise<{
+    total_companies: number;
+    total_employees: number;
+  }> {
     const response = await fetch(`${API_URL}/dashboard/stats`, {
       headers: this.getAuthHeaders(),
     });
-    return this.handleResponse<{ total_companies: number; total_employees: number }>(response);
+    return this.handleResponse<{
+      total_companies: number;
+      total_employees: number;
+    }>(response);
   }
 
   // User Management endpoints
@@ -339,7 +345,9 @@ class ApiClient {
     return this.handleResponse<User>(response);
   }
 
-  async createUser(data: UserFormData): Promise<{ message: string; user: User }> {
+  async createUser(
+    data: UserFormData
+  ): Promise<{ message: string; user: User }> {
     const response = await fetch(`${API_URL}/users`, {
       method: "POST",
       headers: this.getAuthHeaders(),
@@ -348,7 +356,10 @@ class ApiClient {
     return this.handleResponse<{ message: string; user: User }>(response);
   }
 
-  async updateUser(id: number, data: Partial<UserFormData>): Promise<{ message: string; user: User }> {
+  async updateUser(
+    id: number,
+    data: Partial<UserFormData>
+  ): Promise<{ message: string; user: User }> {
     const response = await fetch(`${API_URL}/users/${id}`, {
       method: "PUT",
       headers: this.getAuthHeaders(),
@@ -372,7 +383,10 @@ class ApiClient {
     return this.handleResponse<Role[]>(response);
   }
 
-  async assignRoles(userId: number, roleIds: number[]): Promise<{ message: string; user: User }> {
+  async assignRoles(
+    userId: number,
+    roleIds: number[]
+  ): Promise<{ message: string; user: User }> {
     const response = await fetch(`${API_URL}/users/${userId}/assign-roles`, {
       method: "POST",
       headers: this.getAuthHeaders(),
