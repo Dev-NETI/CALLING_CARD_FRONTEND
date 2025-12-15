@@ -27,7 +27,6 @@ export default function PublicCardPage() {
       setError(null);
       const data = await api.getVirtualCard(employeeId);
       setEmployee(data);
-      console.log(data);
     } catch (error: any) {
       // Handle different error types
       if (error.message?.includes("404")) {

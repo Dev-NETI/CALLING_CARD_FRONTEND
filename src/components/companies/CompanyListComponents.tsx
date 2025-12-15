@@ -28,10 +28,7 @@ export default function CompanyListComponent({
   const fetchCompanies = async () => {
     try {
       setIsLoading(true);
-      console.log("Starting to fetch companies...");
       const data = await api.getCompanies();
-      console.log("Fetched companies:", data);
-      console.log("Number of companies:", data?.length || 0);
       setCompanies(data);
     } catch (error) {
       console.error("Error in fetchCompanies:", error);
