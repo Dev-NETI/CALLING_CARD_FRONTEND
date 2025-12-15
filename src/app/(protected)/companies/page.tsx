@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { Company } from "@/types";
 import Button from "@/components/ui/Button";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Navigation from "@/components/layout/Navigation";
+import { hasPermission, PERMISSIONS } from "@/lib/utils/permissions";
 import AddCompanyModalComponent from "@/components/companies/AddCompanyModalComponent";
 import EditCompanyModalComponent from "@/components/companies/EditCompanyModalComponent";
 import CompanyListComponent from "@/components/companies/CompanyListComponents";
@@ -13,7 +15,15 @@ export default function CompaniesPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
-  const { logout } = useAuth();
+  const { user } = useAuth();
+  const router = useRouter();
+
+  // Check permission
+  useEffect(() => {
+    if (user && !hasPermission(user, PERMISSIONS.MANAGE_COMPANIES)) {
+      router.push("/forbidden");
+    }
+  }, [user, router]);
 
   const handleOpenCreateModal = () => {
     setIsAddModalOpen(true);
@@ -38,39 +48,7 @@ export default function CompaniesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-8">
-              <Link href="/dashboard">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent cursor-pointer">
-                  Virtual Cards
-                </h1>
-              </Link>
-              <div className="hidden md:flex gap-4">
-                <Link href="/dashboard">
-                  <Button variant="outline" size="sm">
-                    Dashboard
-                  </Button>
-                </Link>
-                <Link href="/companies">
-                  <Button variant="primary" size="sm">
-                    Companies
-                  </Button>
-                </Link>
-                <Link href="/employees">
-                  <Button variant="outline" size="sm">
-                    Employees
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={logout}>
-              Logout
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex justify-between items-center mb-8">

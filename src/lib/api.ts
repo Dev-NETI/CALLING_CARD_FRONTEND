@@ -12,6 +12,9 @@ import {
   CompanyFormData,
   EmployeeFormData,
   VirtualCardFormData,
+  UserFormData,
+  Role,
+  PaginatedResponse,
 } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -319,6 +322,63 @@ class ApiClient {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse<{ total_companies: number; total_employees: number }>(response);
+  }
+
+  // User Management endpoints
+  async getUsers(page: number = 1): Promise<PaginatedResponse<User>> {
+    const response = await fetch(`${API_URL}/users?page=${page}`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<PaginatedResponse<User>>(response);
+  }
+
+  async getUser(id: number): Promise<User> {
+    const response = await fetch(`${API_URL}/users/${id}`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<User>(response);
+  }
+
+  async createUser(data: UserFormData): Promise<{ message: string; user: User }> {
+    const response = await fetch(`${API_URL}/users`, {
+      method: "POST",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    return this.handleResponse<{ message: string; user: User }>(response);
+  }
+
+  async updateUser(id: number, data: Partial<UserFormData>): Promise<{ message: string; user: User }> {
+    const response = await fetch(`${API_URL}/users/${id}`, {
+      method: "PUT",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    return this.handleResponse<{ message: string; user: User }>(response);
+  }
+
+  async deleteUser(id: number): Promise<{ message: string }> {
+    const response = await fetch(`${API_URL}/users/${id}`, {
+      method: "DELETE",
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<{ message: string }>(response);
+  }
+
+  async getRoles(): Promise<Role[]> {
+    const response = await fetch(`${API_URL}/roles`, {
+      headers: this.getAuthHeaders(),
+    });
+    return this.handleResponse<Role[]>(response);
+  }
+
+  async assignRoles(userId: number, roleIds: number[]): Promise<{ message: string; user: User }> {
+    const response = await fetch(`${API_URL}/users/${userId}/assign-roles`, {
+      method: "POST",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ role_ids: roleIds }),
+    });
+    return this.handleResponse<{ message: string; user: User }>(response);
   }
 }
 
