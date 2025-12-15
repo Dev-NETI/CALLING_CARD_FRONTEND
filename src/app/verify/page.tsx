@@ -115,8 +115,12 @@ function VerifyPageContent() {
         errorMessage = err.message;
 
         // Provide user-friendly messages
-        if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
-          errorMessage = "Cannot connect to server. Please check your connection.";
+        if (
+          errorMessage.includes("Failed to fetch") ||
+          errorMessage.includes("NetworkError")
+        ) {
+          errorMessage =
+            "Cannot connect to server. Please check your connection.";
         }
       }
 

@@ -2,28 +2,20 @@
 
 import { useAuth } from "@/app/context/AuthContext";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import Card from "@/components/ui/Card";
 import Link from "next/link";
 import Navigation from "@/components/layout/Navigation";
+import PermissionGuard from "@/components/PermissionGuard";
 import { hasPermission, PERMISSIONS } from "@/lib/utils/permissions";
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const router = useRouter();
   const [stats, setStats] = useState({
     total_companies: 0,
     total_employees: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
-
-  // Check permission - dashboard requires view-dashboard permission
-  useEffect(() => {
-    if (user && !hasPermission(user, PERMISSIONS.VIEW_DASHBOARD)) {
-      router.push("/forbidden");
-    }
-  }, [user, router]);
 
   useEffect(() => {
     if (user && hasPermission(user, PERMISSIONS.VIEW_DASHBOARD)) {
@@ -44,8 +36,9 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <Navigation />
+    <PermissionGuard permission={PERMISSIONS.VIEW_DASHBOARD}>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+        <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
@@ -175,5 +168,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+    </PermissionGuard>
   );
 }

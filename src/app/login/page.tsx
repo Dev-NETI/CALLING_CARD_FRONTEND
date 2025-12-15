@@ -40,9 +40,16 @@ export default function LoginPage() {
         errorMessage = error.message;
 
         // Provide user-friendly messages for common errors
-        if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
-          errorMessage = "Cannot connect to server. Please check your connection.";
-        } else if (errorMessage.includes("credentials are incorrect") || errorMessage.includes("Unauthenticated")) {
+        if (
+          errorMessage.includes("Failed to fetch") ||
+          errorMessage.includes("NetworkError")
+        ) {
+          errorMessage =
+            "Cannot connect to server. Please check your connection.";
+        } else if (
+          errorMessage.includes("credentials are incorrect") ||
+          errorMessage.includes("Unauthenticated")
+        ) {
           errorMessage = "Invalid email or password. Please try again.";
         }
       }

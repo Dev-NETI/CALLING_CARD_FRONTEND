@@ -4,16 +4,15 @@ import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
 import { User, Role, UserFormData, PaginatedResponse } from "@/types";
 import { useAuth } from "@/app/context/AuthContext";
-import { useRouter } from "next/navigation";
 import { hasPermission, PERMISSIONS } from "@/lib/utils/permissions";
 import Modal from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
 import { motion, AnimatePresence } from "framer-motion";
 import Navigation from "@/components/layout/Navigation";
+import PermissionGuard from "@/components/PermissionGuard";
 
 export default function UsersPage() {
   const { user } = useAuth();
-  const router = useRouter();
   const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
@@ -33,12 +32,6 @@ export default function UsersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 6;
 
-  // Check permission
-  useEffect(() => {
-    if (user && !hasPermission(user, PERMISSIONS.MANAGE_USERS)) {
-      router.push("/forbidden");
-    }
-  }, [user, router]);
 
   useEffect(() => {
     if (user && hasPermission(user, PERMISSIONS.MANAGE_USERS)) {
@@ -216,8 +209,9 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <Navigation />
+    <PermissionGuard permission={PERMISSIONS.MANAGE_USERS}>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+        <Navigation />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -277,7 +271,7 @@ export default function UsersPage() {
                     placeholder="Enter name..."
                     value={searchName}
                     onChange={(e) => setSearchName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all text-black"
                   />
                   <svg
                     className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
@@ -304,7 +298,7 @@ export default function UsersPage() {
                     placeholder="Enter email..."
                     value={searchEmail}
                     onChange={(e) => setSearchEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent transition-all text-black"
                   />
                   <svg
                     className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
@@ -605,7 +599,7 @@ export default function UsersPage() {
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-black"
               required
             />
           </div>
@@ -620,7 +614,7 @@ export default function UsersPage() {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-black"
               required
             />
           </div>
@@ -635,7 +629,7 @@ export default function UsersPage() {
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-black"
               required={!editingUser}
             />
           </div>
@@ -692,5 +686,6 @@ export default function UsersPage() {
         </form>
       </Modal>
     </div>
+    </PermissionGuard>
   );
 }
