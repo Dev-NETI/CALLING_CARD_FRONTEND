@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from './context/AuthContext';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "./context/AuthContext";
 
 export default function Home() {
   const { token, isLoading } = useAuth();
@@ -11,9 +11,9 @@ export default function Home() {
   useEffect(() => {
     if (!isLoading) {
       if (token) {
-        router.push('/dashboard');
+        router.push("/dashboard");
       } else {
-        router.push('/login');
+        router.push("/login");
       }
     }
   }, [token, isLoading, router]);
