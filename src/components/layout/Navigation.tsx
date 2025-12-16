@@ -19,7 +19,7 @@ export default function Navigation() {
           <div className="flex items-center gap-8">
             <Link href="/dashboard">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent cursor-pointer">
-                Virtual Cards
+                NETI Business Card App
               </h1>
             </Link>
             <div className="hidden md:flex gap-4">
