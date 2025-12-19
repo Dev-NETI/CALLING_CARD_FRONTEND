@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { useToast } from "@/components/ui/Toast";
@@ -14,9 +14,25 @@ export default function LoginPage() {
   const [email, setEmail] = useState("sean@gmail.com");
   const [password, setPassword] = useState("password123");
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const { login } = useAuth();
   const { showToast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Generate stable random positions for floating shapes
+  const floatingShapes = useMemo(() => {
+    return [...Array(6)].map((_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: 3 + Math.random() * 2,
+      delay: Math.random() * 2,
+    }));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,25 +116,26 @@ export default function LoginPage() {
         />
 
         {/* Floating shapes */}
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-white rounded-full opacity-20"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.2, 0.5, 0.2],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
+        {isMounted &&
+          floatingShapes.map((shape) => (
+            <motion.div
+              key={shape.id}
+              className="absolute w-2 h-2 bg-white rounded-full opacity-20"
+              style={{
+                left: `${shape.left}%`,
+                top: `${shape.top}%`,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0.2, 0.5, 0.2],
+              }}
+              transition={{
+                duration: shape.duration,
+                repeat: Infinity,
+                delay: shape.delay,
+              }}
+            />
+          ))}
       </div>
 
       <div className="flex flex-1 flex-col lg:flex-row relative z-10">
