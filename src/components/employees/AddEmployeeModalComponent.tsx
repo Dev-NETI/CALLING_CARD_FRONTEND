@@ -36,6 +36,8 @@ export default function AddEmployeeModalComponent({
     date_hired: "",
     status: "active",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const { showToast } = useToast();
 
@@ -54,7 +56,22 @@ export default function AddEmployeeModalComponent({
       date_hired: "",
       status: "active",
     });
+    setImageFile(null);
+    setImagePreview(null);
     onClose();
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,7 +79,21 @@ export default function AddEmployeeModalComponent({
     setIsSaving(true);
 
     try {
-      await api.createEmployee(formData);
+      let requestData: EmployeeFormData | FormData = formData;
+
+      // If image is selected, use FormData
+      if (imageFile) {
+        const formDataWithImage = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            formDataWithImage.append(key, value.toString());
+          }
+        });
+        formDataWithImage.append("image", imageFile);
+        requestData = formDataWithImage;
+      }
+
+      await api.createEmployee(requestData);
       showToast("Employee created successfully", "success");
       handleClose();
       onSuccess();
@@ -191,6 +222,31 @@ export default function AddEmployeeModalComponent({
               setFormData({ ...formData, date_hired: e.target.value })
             }
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Employee Image (Optional)
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="block w-full text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-blue-50 file:text-blue-700
+              hover:file:bg-blue-100"
+          />
+          {imagePreview && (
+            <div className="mt-4">
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-32 h-32 object-cover rounded-lg border-2 border-gray-300"
+              />
+            </div>
+          )}
         </div>
         <Select
           label="Status"
