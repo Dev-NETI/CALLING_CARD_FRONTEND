@@ -222,20 +222,44 @@ class ApiClient {
     return this.handleResponse<Employee>(response);
   }
 
-  async createEmployee(data: EmployeeFormData): Promise<Employee> {
+  async createEmployee(data: EmployeeFormData | FormData): Promise<Employee> {
+    const headers = this.getAuthHeaders();
+    // Remove Content-Type header for FormData (browser will set it with boundary)
+    if (data instanceof FormData) {
+      delete (headers as any)["Content-Type"];
+    }
+
     const response = await fetch(`${API_URL}/employees`, {
       method: "POST",
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify(data),
+      headers,
+      body: data instanceof FormData ? data : JSON.stringify(data),
     });
     return this.handleResponse<Employee>(response);
   }
 
-  async updateEmployee(id: number, data: EmployeeFormData): Promise<Employee> {
+  async updateEmployee(
+    id: number,
+    data: EmployeeFormData | FormData
+  ): Promise<Employee> {
+    const headers = this.getAuthHeaders();
+    let body: FormData | string;
+    let method = "PUT";
+
+    if (data instanceof FormData) {
+      // Remove Content-Type header for FormData (browser will set it with boundary)
+      delete (headers as any)["Content-Type"];
+      // Laravel requires POST with _method=PUT for file uploads
+      data.append("_method", "PUT");
+      body = data;
+      method = "POST";
+    } else {
+      body = JSON.stringify(data);
+    }
+
     const response = await fetch(`${API_URL}/employees/${id}`, {
-      method: "PUT",
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify(data),
+      method,
+      headers,
+      body,
     });
     return this.handleResponse<Employee>(response);
   }

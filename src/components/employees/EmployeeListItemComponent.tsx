@@ -64,12 +64,20 @@ export default function EmployeeListItemComponent({
             transition={{ duration: 0.2 }}
             className="flex-shrink-0 h-12 w-12"
           >
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-base">
-                {employee.first_name.charAt(0)}
-                {employee.last_name.charAt(0)}
-              </span>
-            </div>
+            {employee.image_url ? (
+              <img
+                src={employee.image_url}
+                alt={`${employee.first_name} ${employee.last_name}`}
+                className="h-12 w-12 rounded-full object-cover shadow-md border-2 border-gray-200"
+              />
+            ) : (
+              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-md">
+                <span className="text-white font-bold text-base">
+                  {employee.first_name.charAt(0)}
+                  {employee.last_name.charAt(0)}
+                </span>
+              </div>
+            )}
           </motion.div>
           <div className="ml-4">
             <div className="text-sm font-semibold text-gray-900 tracking-tight">
