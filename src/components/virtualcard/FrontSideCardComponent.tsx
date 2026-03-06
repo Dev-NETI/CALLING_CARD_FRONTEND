@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Employee } from "@/types";
 import Image from "next/image";
 
@@ -5,15 +6,17 @@ interface FrontSideCardComponentProps {
   employee: Employee;
 }
 
-export default function FrontSideCardComponent({
-  employee,
-}: FrontSideCardComponentProps) {
+const FrontSideCardComponent = forwardRef<
+  HTMLDivElement,
+  FrontSideCardComponentProps
+>(function FrontSideCardComponent({ employee }, ref) {
   const middleInitial = employee.middle_name
     ? `${employee.middle_name.charAt(0)}.`
     : "";
 
   return (
     <div
+      ref={ref}
       className="absolute inset-0 w-full h-full bg-white rounded-lg shadow-2xl p-4 sm:p-6 md:p-8 flex flex-col justify-between"
       style={{
         backfaceVisibility: "hidden",
@@ -130,4 +133,6 @@ export default function FrontSideCardComponent({
       </div>
     </div>
   );
-}
+});
+
+export default FrontSideCardComponent;

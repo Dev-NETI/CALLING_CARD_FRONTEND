@@ -129,7 +129,7 @@ class ApiClient {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         throw new Error(
           "Cannot connect to backend server. Make sure it is running on " +
-            API_URL
+            API_URL,
         );
       }
       throw error;
@@ -150,7 +150,7 @@ class ApiClient {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         throw new Error(
           "Cannot connect to backend server. Make sure it is running on " +
-            API_URL
+            API_URL,
         );
       }
       throw error;
@@ -185,7 +185,7 @@ class ApiClient {
 
       if (!response.ok) {
         throw new Error(
-          `Failed to fetch employees: ${response.status} ${response.statusText}`
+          `Failed to fetch employees: ${response.status} ${response.statusText}`,
         );
       }
 
@@ -208,7 +208,7 @@ class ApiClient {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         throw new Error(
           "Cannot connect to backend server. Make sure it is running on " +
-            API_URL
+            API_URL,
         );
       }
       throw error;
@@ -239,7 +239,7 @@ class ApiClient {
 
   async updateEmployee(
     id: number,
-    data: EmployeeFormData | FormData
+    data: EmployeeFormData | FormData,
   ): Promise<Employee> {
     const headers = this.getAuthHeaders();
     let body: FormData | string;
@@ -296,7 +296,7 @@ class ApiClient {
       `${API_URL}/employees/virtual-card/${employeeId}`,
       {
         headers: this.getAuthHeaders(),
-      }
+      },
     );
     return this.handleResponse<VirtualCard>(response);
   }
@@ -340,7 +340,7 @@ class ApiClient {
   }
 
   async createUser(
-    data: UserFormData
+    data: UserFormData,
   ): Promise<{ message: string; user: User }> {
     const response = await fetch(`${API_URL}/users`, {
       method: "POST",
@@ -352,7 +352,7 @@ class ApiClient {
 
   async updateUser(
     id: number,
-    data: Partial<UserFormData>
+    data: Partial<UserFormData>,
   ): Promise<{ message: string; user: User }> {
     const response = await fetch(`${API_URL}/users/${id}`, {
       method: "PUT",
@@ -379,7 +379,7 @@ class ApiClient {
 
   async assignRoles(
     userId: number,
-    roleIds: number[]
+    roleIds: number[],
   ): Promise<{ message: string; user: User }> {
     const response = await fetch(`${API_URL}/users/${userId}/assign-roles`, {
       method: "POST",

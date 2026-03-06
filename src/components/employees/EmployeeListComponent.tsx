@@ -528,7 +528,7 @@ export default function EmployeeListComponent({
                       >
                         {page}
                       </motion.button>
-                    )
+                    ),
                   )}
                 </div>
 

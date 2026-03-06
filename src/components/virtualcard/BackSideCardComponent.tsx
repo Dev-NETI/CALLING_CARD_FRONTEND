@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Employee } from "@/types";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
@@ -7,13 +8,15 @@ interface BackSideCardComponentProps {
 }
 
 const QR_CODE_URL =
-  "https://docs.google.com/presentation/d/1aZQvKyC4o_CLf8d2gvm4gClbzrvUb2iZ/mobilepresent?pli=1&slide=id.p1";
+  "https://netiph-my.sharepoint.com/:b:/g/personal/hannah_hernandez_neti_com_ph/IQCosby9uj4wT6e8GLcrc6ibAUKobdW25mkUDVox44Fp63o?e=Ss08aQ";
 
-export default function BackSideCardComponent({
-  employee,
-}: BackSideCardComponentProps) {
+const BackSideCardComponent = forwardRef<
+  HTMLDivElement,
+  BackSideCardComponentProps
+>(function BackSideCardComponent({ employee }, ref) {
   return (
     <div
+      ref={ref}
       className="absolute inset-0 w-full h-full bg-white rounded-lg shadow-2xl p-[clamp(0.5rem,2vw,2rem)] flex flex-col justify-between"
       style={{
         backfaceVisibility: "hidden",
@@ -143,4 +146,6 @@ export default function BackSideCardComponent({
       </div>
     </div>
   );
-}
+});
+
+export default BackSideCardComponent;
