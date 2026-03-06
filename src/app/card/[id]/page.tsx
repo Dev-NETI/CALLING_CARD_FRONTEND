@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
+import html2canvas from "html2canvas";
 import { api } from "@/lib/api";
 import { Employee } from "@/types";
 import Button from "@/components/ui/Button";
-import FlippableCard from "@/components/virtualcard/FlippableCard";
+import FlippableCard, {
+  FlippableCardHandle,
+} from "@/components/virtualcard/FlippableCard";
 
 export default function PublicCardPage() {
   const params = useParams();
@@ -14,6 +17,8 @@ export default function PublicCardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const cardRef = useRef<FlippableCardHandle>(null);
 
   useEffect(() => {
     if (employeeId) {
@@ -72,6 +77,78 @@ END:VCARD`;
     window.URL.revokeObjectURL(url);
   };
 
+  const captureElement = async (
+    element: HTMLDivElement
+  ): Promise<string> => {
+    // Get the rendered dimensions of the element
+    const rect = element.getBoundingClientRect();
+
+    // Clone the element so we can capture it without affecting the visible card
+    const clone = element.cloneNode(true) as HTMLDivElement;
+
+    // Set explicit pixel dimensions on the clone to preserve the exact layout
+    clone.style.position = "fixed";
+    clone.style.left = "-9999px";
+    clone.style.top = "0";
+    clone.style.width = `${rect.width}px`;
+    clone.style.height = `${rect.height}px`;
+    clone.style.transform = "none";
+    clone.style.backfaceVisibility = "visible";
+    (clone.style as any).WebkitBackfaceVisibility = "visible";
+
+    document.body.appendChild(clone);
+
+    const canvas = await html2canvas(clone, {
+      width: rect.width,
+      height: rect.height,
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: "#ffffff",
+    });
+
+    document.body.removeChild(clone);
+
+    return canvas.toDataURL("image/png");
+  };
+
+  const downloadImage = (dataUrl: string, filename: string) => {
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDownloadCard = async () => {
+    if (!employee || !cardRef.current) return;
+
+    const { frontRef, backRef } = cardRef.current;
+    if (!frontRef || !backRef) return;
+
+    setIsDownloading(true);
+
+    try {
+      const name = `${employee.first_name}_${employee.last_name}`;
+
+      // Capture front side
+      const frontDataUrl = await captureElement(frontRef);
+      downloadImage(frontDataUrl, `${name}_front.png`);
+
+      // Small delay between downloads so browser handles both
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Capture back side
+      const backDataUrl = await captureElement(backRef);
+      downloadImage(backDataUrl, `${name}_back.png`);
+    } catch (err) {
+      console.error("Error downloading card images:", err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
@@ -115,43 +192,6 @@ END:VCARD`;
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 flex justify-end gap-3">
-          {/* <Button variant="outline" size="sm" onClick={handleCopyUrl}>
-            {copied ? (
-              <>
-                <svg
-                  className="w-4 h-4 mr-2 inline-block"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                Copied!
-              </>
-            ) : (
-              <>
-                <svg
-                  className="w-4 h-4 mr-2 inline-block"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                  />
-                </svg>
-                Share
-              </>
-            )}
-          </Button> */}
           <Button variant="primary" size="sm" onClick={handleDownloadContact}>
             <svg
               className="w-4 h-4 mr-2 inline-block"
@@ -168,13 +208,30 @@ END:VCARD`;
             </svg>
             Save Contact
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadCard}
+            disabled={isDownloading}
+          >
+            <svg
+              className="w-4 h-4 mr-2 inline-block"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            {isDownloading ? "Downloading..." : "Download Card"}
+          </Button>
         </div>
 
-        <FlippableCard employee={employee} />
-
-        {/* <div className="mt-8 text-center text-gray-600">
-          <p className="text-sm"></p>
-        </div> */}
+        <FlippableCard ref={cardRef} employee={employee} />
       </div>
     </div>
   );
