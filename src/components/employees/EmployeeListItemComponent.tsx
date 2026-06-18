@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Dropdown from "@/components/ui/Dropdown";
@@ -17,7 +18,7 @@ interface EmployeeListItemProps {
   index: number;
 }
 
-export default function EmployeeListItemComponent({
+const EmployeeListItemComponent = memo(function EmployeeListItemComponent({
   employee,
   companyName,
   companyHasBcard,
@@ -30,11 +31,11 @@ export default function EmployeeListItemComponent({
   const router = useRouter();
   const { showToast } = useToast();
 
-  const handleCardClick = () => {
+  const handleCardClick = useCallback(() => {
     router.push(`/card/${employee.id}`);
-  };
+  }, [router, employee.id]);
 
-  const handleCopyLink = async () => {
+  const handleCopyLink = useCallback(async () => {
     const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
     const cardUrl = `${frontendUrl}card/${employee.id}`;
 
@@ -45,7 +46,54 @@ export default function EmployeeListItemComponent({
       console.error("Failed to copy link:", err);
       showToast("Failed to copy URL. Please try again.", "error");
     }
-  };
+  }, [employee.id, showToast]);
+
+  const dropdownItems = useMemo(() => [
+    ...(companyHasBcard
+      ? [
+          {
+            label: "View Card",
+            onClick: handleCardClick,
+            variant: "primary" as const,
+            icon: (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+              </svg>
+            ),
+          },
+          {
+            label: "Copy Link",
+            onClick: handleCopyLink,
+            variant: "default" as const,
+            icon: (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            ),
+          },
+        ]
+      : []),
+    {
+      label: "Edit",
+      onClick: () => onEdit(employee),
+      variant: "default" as const,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      ),
+    },
+    {
+      label: "Delete",
+      onClick: () => onDelete(employee.id),
+      variant: "danger" as const,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      ),
+    },
+  ], [companyHasBcard, handleCardClick, handleCopyLink, onEdit, onDelete, employee]);
 
   return (
     <motion.tr
@@ -138,115 +186,12 @@ export default function EmployeeListItemComponent({
                 </svg>
               </button>
             }
-            items={[
-              ...(companyHasBcard
-                ? [
-                    {
-                      label: "View Card",
-                      onClick: handleCardClick,
-                      variant: "primary" as const,
-                      icon: (
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
-                          />
-                        </svg>
-                      ),
-                    },
-                    {
-                      label: "Copy Link",
-                      onClick: handleCopyLink,
-                      variant: "default" as const,
-                      icon: (
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                          />
-                        </svg>
-                      ),
-                    },
-                  ]
-                : []),
-              // {
-              //   label: "Generate ID Card",
-              //   onClick: () => onGenerateIDCard(employee),
-              //   variant: "primary" as const,
-              //   icon: (
-              //     <svg
-              //       className="w-4 h-4"
-              //       fill="none"
-              //       stroke="currentColor"
-              //       viewBox="0 0 24 24"
-              //     >
-              //       <path
-              //         strokeLinecap="round"
-              //         strokeLinejoin="round"
-              //         strokeWidth={2}
-              //         d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
-              //       />
-              //     </svg>
-              //   ),
-              // },
-              {
-                label: "Edit",
-                onClick: () => onEdit(employee),
-                variant: "default" as const,
-                icon: (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                ),
-              },
-              {
-                label: "Delete",
-                onClick: () => onDelete(employee.id),
-                variant: "danger" as const,
-                icon: (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                ),
-              },
-            ]}
+            items={dropdownItems}
           />
         </div>
       </td>
     </motion.tr>
   );
-}
+});
+
+export default EmployeeListItemComponent;

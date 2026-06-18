@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { hasPermission, hasAnyPermission } from "@/lib/utils/permissions";
@@ -26,38 +26,28 @@ export default function PermissionGuard({
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
+  const hasAccess = useMemo(() => {
+    if (!user) return false;
+    if (permission) return hasPermission(user, permission);
+    if (permissions && permissions.length > 0) {
+      return requireAll
+        ? permissions.every((perm) => hasPermission(user, perm))
+        : hasAnyPermission(user, permissions);
+    }
+    return true;
+  }, [user, permission, permissions, requireAll]);
+
   useEffect(() => {
     if (isLoading) return;
-
     if (!user) {
       router.push("/login");
       return;
     }
-
-    let hasAccess = true;
-
-    // Check single permission
-    if (permission) {
-      hasAccess = hasPermission(user, permission);
-    }
-
-    // Check multiple permissions
-    if (permissions && permissions.length > 0) {
-      if (requireAll) {
-        // User must have ALL permissions
-        hasAccess = permissions.every((perm) => hasPermission(user, perm));
-      } else {
-        // User must have AT LEAST ONE permission
-        hasAccess = hasAnyPermission(user, permissions);
-      }
-    }
-
     if (!hasAccess) {
       router.push("/forbidden");
     }
-  }, [user, isLoading, permission, permissions, requireAll, router]);
+  }, [user, isLoading, hasAccess, router]);
 
-  // Show loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -66,27 +56,7 @@ export default function PermissionGuard({
     );
   }
 
-  // Show nothing while checking permissions
-  if (!user) {
-    return null;
-  }
-
-  // Check permissions before rendering
-  let hasAccess = true;
-
-  if (permission) {
-    hasAccess = hasPermission(user, permission);
-  }
-
-  if (permissions && permissions.length > 0) {
-    if (requireAll) {
-      hasAccess = permissions.every((perm) => hasPermission(user, perm));
-    } else {
-      hasAccess = hasAnyPermission(user, permissions);
-    }
-  }
-
-  if (!hasAccess) {
+  if (!user || !hasAccess) {
     return null;
   }
 

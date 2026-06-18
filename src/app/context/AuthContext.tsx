@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { User, LoginCredentials, RegisterData } from "@/types";
 import { api } from "@/lib/api";
@@ -34,35 +34,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = (user: User, token: string) => {
+  const login = useCallback((user: User, token: string) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
     setToken(token);
     setUser(user);
     router.push("/dashboard");
-  };
+  }, [router]);
 
-  const loginWithCredentials = async (credentials: LoginCredentials) => {
-    try {
-      const response = await api.login(credentials);
-      if (response.token && response.user) {
-        login(response.user, response.token);
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const register = async (data: RegisterData) => {
-    try {
-      const response = await api.register(data);
+  const loginWithCredentials = useCallback(async (credentials: LoginCredentials) => {
+    const response = await api.login(credentials);
+    if (response.requires_2fa_setup && response.challenge_token) {
+      router.push(`/2fa/setup?token=${response.challenge_token}`);
+    } else if (response.requires_2fa && response.challenge_token) {
+      router.push(`/2fa/verify?token=${response.challenge_token}`);
+    } else if (response.token && response.user) {
       login(response.user, response.token);
-    } catch (error) {
-      throw error;
     }
-  };
+  }, [login, router]);
 
-  const logout = async () => {
+  const register = useCallback(async (data: RegisterData) => {
+    const response = await api.register(data);
+    if (response.requires_2fa_setup && response.challenge_token) {
+      router.push(`/2fa/setup?token=${response.challenge_token}`);
+    } else if (response.token && response.user) {
+      login(response.user, response.token);
+    }
+  }, [login, router]);
+
+  const logout = useCallback(async () => {
     try {
       await api.logout();
     } catch (error) {
@@ -74,20 +74,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       router.push("/login");
     }
-  };
+  }, [router]);
+
+  const value = useMemo(() => ({
+    user,
+    token,
+    login,
+    loginWithCredentials,
+    register,
+    logout,
+    isLoading,
+  }), [user, token, login, loginWithCredentials, register, logout, isLoading]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        login,
-        loginWithCredentials,
-        register,
-        logout,
-        isLoading,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

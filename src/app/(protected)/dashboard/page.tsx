@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/app/context/AuthContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/api";
 import Card from "@/components/ui/Card";
 import Link from "next/link";
@@ -17,13 +17,7 @@ export default function DashboardPage() {
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (user && hasPermission(user, PERMISSIONS.VIEW_DASHBOARD)) {
-      fetchStats();
-    }
-  }, [user]);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await api.getDashboardStats();
@@ -33,7 +27,13 @@ export default function DashboardPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (user && hasPermission(user, PERMISSIONS.VIEW_DASHBOARD)) {
+      fetchStats();
+    }
+  }, [user, fetchStats]);
 
   return (
     <PermissionGuard permission={PERMISSIONS.VIEW_DASHBOARD}>

@@ -85,19 +85,21 @@ export interface AuthResponse {
 
 export interface LoginResponse {
   message: string;
-  requires_verification?: boolean;
-  user_id?: number;
+  requires_2fa?: boolean;
+  requires_2fa_setup?: boolean;
+  challenge_token?: string;
   user?: User;
   token?: string;
 }
 
-export interface VerifyCodeRequest {
-  user_id: number;
-  code: string;
+export interface TwoFactorSetupResponse {
+  qr_code: string;
+  secret: string;
 }
 
-export interface ResendCodeRequest {
-  user_id: number;
+export interface TwoFactorVerifyRequest {
+  challenge_token: string;
+  code: string;
 }
 
 export interface LoginCredentials {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Employee, Company } from "@/types";
 import { api } from "@/lib/api";
@@ -42,14 +42,7 @@ export default function EmployeeListComponent({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  useEffect(() => {
-    if (token) {
-      fetchData();
-    }
-  }, [token]);
-
-  const fetchData = async () => {
-    // Verify token exists before making requests
+  const fetchData = useCallback(async () => {
     if (!token) {
       showToast("Authentication required. Please login again.", "error");
       return;
@@ -63,7 +56,6 @@ export default function EmployeeListComponent({
         api.getCompanies(),
       ]);
 
-      // Ensure we always have arrays
       setEmployees(Array.isArray(employeesData) ? employeesData : []);
       setCompanies(Array.isArray(companiesData) ? companiesData : []);
     } catch (error) {
@@ -71,7 +63,6 @@ export default function EmployeeListComponent({
       const errorMessage =
         error instanceof Error ? error.message : "Failed to load data";
 
-      // Check if it's an authentication error
       if (
         errorMessage.includes("401") ||
         errorMessage.includes("Unauthorized") ||
@@ -85,7 +76,13 @@ export default function EmployeeListComponent({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token, showToast, logout]);
+
+  useEffect(() => {
+    if (token) {
+      fetchData();
+    }
+  }, [token, fetchData]);
 
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this employee?")) return;
@@ -103,14 +100,19 @@ export default function EmployeeListComponent({
     setSelectedEmployeeForIDCard(employee);
   };
 
-  const getCompanyName = (companyId: number) => {
-    const company = companies.find((c) => c.id === companyId);
-    return company?.company_name || "Unknown";
-  };
+  const companyMap = useMemo(() => {
+    const map = new Map<number, Company>();
+    companies.forEach((c) => map.set(c.id, c));
+    return map;
+  }, [companies]);
 
-  const getCompany = (companyId: number) => {
-    return companies.find((c) => c.id === companyId);
-  };
+  const getCompanyName = useCallback((companyId: number) => {
+    return companyMap.get(companyId)?.company_name ?? "Unknown";
+  }, [companyMap]);
+
+  const getCompany = useCallback((companyId: number) => {
+    return companyMap.get(companyId);
+  }, [companyMap]);
 
   // Get unique departments for dropdown
   const uniqueDepartments = useMemo(() => {
@@ -156,14 +158,12 @@ export default function EmployeeListComponent({
     setCurrentPage(1);
   }, [searchQuery, filterDepartment, filterCompany]);
 
-  // Expose refresh method for parent component
   useEffect(() => {
-    // Store fetchData in a way the parent can call it
     (window as any).__refreshEmployees = fetchData;
     return () => {
       delete (window as any).__refreshEmployees;
     };
-  }, []);
+  }, [fetchData]);
 
   if (isLoading) {
     return (
