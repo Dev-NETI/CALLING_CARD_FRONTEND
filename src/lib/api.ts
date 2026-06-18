@@ -5,8 +5,8 @@ import {
   VirtualCard,
   AuthResponse,
   LoginResponse,
-  VerifyCodeRequest,
-  ResendCodeRequest,
+  TwoFactorSetupResponse,
+  TwoFactorVerifyRequest,
   LoginCredentials,
   RegisterData,
   CompanyFormData,
@@ -18,6 +18,7 @@ import {
 } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const MICROSOFT_LOGIN_URL = process.env.NEXT_PUBLIC_MICROSOFT_LOGIN_URL;
 
 class ApiClient {
   private getAuthHeaders(): HeadersInit {
@@ -63,13 +64,13 @@ class ApiClient {
   }
 
   // Auth endpoints
-  async register(data: RegisterData): Promise<AuthResponse> {
+  async register(data: RegisterData): Promise<LoginResponse> {
     const response = await fetch(`${API_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    return this.handleResponse<AuthResponse>(response);
+    return this.handleResponse<LoginResponse>(response);
   }
 
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
@@ -81,8 +82,21 @@ class ApiClient {
     return this.handleResponse<LoginResponse>(response);
   }
 
-  async verifyCode(data: VerifyCodeRequest): Promise<AuthResponse> {
-    const response = await fetch(`${API_URL}/verify-code`, {
+  async twoFactorGetSetup(
+    challengeToken: string,
+  ): Promise<TwoFactorSetupResponse> {
+    const response = await fetch(`${API_URL}/auth/2fa/setup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ challenge_token: challengeToken }),
+    });
+    return this.handleResponse<TwoFactorSetupResponse>(response);
+  }
+
+  async twoFactorConfirmSetup(
+    data: TwoFactorVerifyRequest,
+  ): Promise<AuthResponse> {
+    const response = await fetch(`${API_URL}/auth/2fa/setup/confirm`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -90,13 +104,17 @@ class ApiClient {
     return this.handleResponse<AuthResponse>(response);
   }
 
-  async resendCode(data: ResendCodeRequest): Promise<{ message: string }> {
-    const response = await fetch(`${API_URL}/resend-code`, {
+  async twoFactorVerify(data: TwoFactorVerifyRequest): Promise<AuthResponse> {
+    const response = await fetch(`${API_URL}/auth/2fa/verify`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    return this.handleResponse<{ message: string }>(response);
+    return this.handleResponse<AuthResponse>(response);
+  }
+
+  getMicrosoftRedirectUrl(): string {
+    return MICROSOFT_LOGIN_URL || `${API_URL}/auth/microsoft/redirect`;
   }
 
   async logout(): Promise<void> {

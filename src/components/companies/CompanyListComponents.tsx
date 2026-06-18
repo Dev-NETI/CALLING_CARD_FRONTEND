@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Company } from "@/types";
 import { api } from "@/lib/api";
 import { useToast } from "@/components/ui/Toast";
@@ -21,11 +21,7 @@ export default function CompanyListComponent({
   const [isLoading, setIsLoading] = useState(true);
   const { showToast } = useToast();
 
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
-
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await api.getCompanies();
@@ -39,7 +35,11 @@ export default function CompanyListComponent({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [showToast]);
+
+  useEffect(() => {
+    fetchCompanies();
+  }, [fetchCompanies]);
 
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this company?")) return;
@@ -53,14 +53,12 @@ export default function CompanyListComponent({
     }
   };
 
-  // Expose refresh method for parent component
   useEffect(() => {
-    // Store fetchCompanies in a way the parent can call it
     (window as any).__refreshCompanies = fetchCompanies;
     return () => {
       delete (window as any).__refreshCompanies;
     };
-  }, []);
+  }, [fetchCompanies]);
 
   if (isLoading) {
     return (
