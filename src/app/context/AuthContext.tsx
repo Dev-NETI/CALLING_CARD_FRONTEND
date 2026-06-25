@@ -25,13 +25,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    if (!storedToken) {
+      setIsLoading(false);
+      return;
     }
-    setIsLoading(false);
+
+    setToken(storedToken);
+
+    api.getCurrentUser()
+      .then((freshUser) => {
+        localStorage.setItem("user", JSON.stringify(freshUser));
+        setUser(freshUser);
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setToken(null);
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
   const login = useCallback((user: User, token: string) => {
