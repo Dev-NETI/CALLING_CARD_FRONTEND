@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Company } from "@/types";
@@ -15,6 +16,8 @@ export default function CompanyListItemComponent({
   onEdit,
   onDelete,
 }: CompanyListItemProps) {
+  const router = useRouter();
+
   return (
     <Card hover>
       <div className="flex items-start justify-between mb-4">
@@ -142,23 +145,46 @@ export default function CompanyListItemComponent({
           </div>
         )}
       </div>
-      <div className="flex gap-2 pt-4 border-t">
+      <div className="flex flex-col gap-2 pt-4 border-t">
         <Button
-          variant="outline"
+          variant="primary"
           size="sm"
-          className="flex-1"
-          onClick={() => onEdit(company)}
+          className="w-full"
+          onClick={() => router.push(`/companies/${company.id}/card-design`)}
         >
-          Edit
+          <svg
+            className="w-4 h-4 mr-2 inline-block"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+            />
+          </svg>
+          Design Card
         </Button>
-        <Button
-          variant="danger"
-          size="sm"
-          className="flex-1"
-          onClick={() => onDelete(company.id)}
-        >
-          Delete
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => onEdit(company)}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
+            className="flex-1"
+            onClick={() => onDelete(company.id)}
+          >
+            Delete
+          </Button>
+        </div>
       </div>
     </Card>
   );

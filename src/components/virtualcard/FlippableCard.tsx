@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useRef, forwardRef, useImperativeHandle } from "react";
-import { Employee } from "@/types";
+import { Employee, CardDesign } from "@/types";
 import FrontSideCardComponent from "./FrontSideCardComponent";
 import BackSideCardComponent from "./BackSideCardComponent";
 
 interface FlippableCardProps {
   employee: Employee;
+  cardDesign?: CardDesign;
 }
 
 export interface FlippableCardHandle {
@@ -15,7 +16,7 @@ export interface FlippableCardHandle {
 }
 
 const FlippableCard = forwardRef<FlippableCardHandle, FlippableCardProps>(
-  function FlippableCard({ employee }, ref) {
+  function FlippableCard({ employee, cardDesign }, ref) {
     const [isFlipped, setIsFlipped] = useState(false);
     const frontRef = useRef<HTMLDivElement>(null);
     const backRef = useRef<HTMLDivElement>(null);
@@ -31,20 +32,17 @@ const FlippableCard = forwardRef<FlippableCardHandle, FlippableCardProps>(
 
     if (!employee) return null;
 
-    const handleFlip = () => {
-      setIsFlipped(!isFlipped);
-    };
+    // Explicit prop takes priority (used in design editor preview),
+    // otherwise fall back to the company's saved design.
+    const resolvedDesign = cardDesign ?? employee.company?.card_design;
 
     return (
-      <div className="w-full max-w-5xl mx-auto @container">
-        {/* Card Container with 3D Flip - Business card aspect ratio (3.5:2) */}
+      <div className="w-full max-w-5xl mx-auto">
+        {/* @container here so cqw inside card sides = card width */}
         <div
-          className="relative w-full cursor-pointer"
-          style={{
-            paddingBottom: "57.14%",
-            perspective: "1000px",
-          }}
-          onClick={handleFlip}
+          className="relative w-full cursor-pointer @container"
+          style={{ paddingBottom: "57.14%", perspective: "1000px" }}
+          onClick={() => setIsFlipped(!isFlipped)}
         >
           <div
             className="absolute inset-0 transition-transform duration-700"
@@ -53,8 +51,16 @@ const FlippableCard = forwardRef<FlippableCardHandle, FlippableCardProps>(
               transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
             }}
           >
-            <FrontSideCardComponent ref={frontRef} employee={employee} />
-            <BackSideCardComponent ref={backRef} employee={employee} />
+            <FrontSideCardComponent
+              ref={frontRef}
+              employee={employee}
+              cardDesign={resolvedDesign}
+            />
+            <BackSideCardComponent
+              ref={backRef}
+              employee={employee}
+              cardDesign={resolvedDesign}
+            />
           </div>
         </div>
       </div>

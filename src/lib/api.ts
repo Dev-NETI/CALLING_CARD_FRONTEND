@@ -15,6 +15,8 @@ import {
   UserFormData,
   Role,
   PaginatedResponse,
+  CardDesign,
+  CardDesignFormData,
 } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -194,6 +196,35 @@ class ApiClient {
     }
   }
 
+  async getCardDesign(companyId: number): Promise<CardDesign | null> {
+    try {
+      const response = await fetch(
+        `${API_URL}/companies/${companyId}/card-design`,
+        { headers: this.getAuthHeaders() },
+      );
+      if (response.status === 404) return null;
+      return this.handleResponse<CardDesign>(response);
+    } catch {
+      return null;
+    }
+  }
+
+  async saveCardDesign(
+    companyId: number,
+    data: CardDesignFormData,
+    existingDesignId?: number,
+  ): Promise<CardDesign> {
+    const response = await fetch(
+      `${API_URL}/companies/${companyId}/card-design`,
+      {
+        method: existingDesignId ? "PUT" : "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data),
+      },
+    );
+    return this.handleResponse<CardDesign>(response);
+  }
+
   // Employee endpoints
   async getEmployees(): Promise<Employee[]> {
     try {
@@ -241,18 +272,27 @@ class ApiClient {
   }
 
   async createEmployee(data: EmployeeFormData | FormData): Promise<Employee> {
-    const headers = this.getAuthHeaders();
-    // Remove Content-Type header for FormData (browser will set it with boundary)
-    if (data instanceof FormData) {
-      delete (headers as any)["Content-Type"];
-    }
+    try {
+      const headers = this.getAuthHeaders();
+      if (data instanceof FormData) {
+        delete (headers as any)["Content-Type"];
+      }
 
-    const response = await fetch(`${API_URL}/employees`, {
-      method: "POST",
-      headers,
-      body: data instanceof FormData ? data : JSON.stringify(data),
-    });
-    return this.handleResponse<Employee>(response);
+      const response = await fetch(`${API_URL}/employees`, {
+        method: "POST",
+        headers,
+        body: data instanceof FormData ? data : JSON.stringify(data),
+      });
+      return this.handleResponse<Employee>(response);
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        throw new Error(
+          "Cannot connect to backend server. Make sure it is running on " +
+            API_URL,
+        );
+      }
+      throw error;
+    }
   }
 
   async updateEmployee(
