@@ -2,20 +2,6 @@
   "permissions": {
     "allow": [
       "Read(//c/xampp/htdocs/CALLING_CARD/**)",
-      "Bash(php artisan tinker '--execute= *)",
-      "Bash(curl -s \"https://api-business-card.neti.com.ph/api/cards/71\")",
-      "Bash(curl -sv \"https://api-business-card.neti.com.ph/api/cards/71\")",
-      "Bash(npx tsc *)",
-      "Bash(npx next *)",
-      "Skill(run)",
-      "Bash(php artisan *)",
-      "Bash(npx --no-install playwright --version)",
-      "Bash(curl -sI https://registry.npmjs.org/playwright)",
-      "Bash(curl *)",
-      "Bash(powershell -NoProfile -Command \"Get-Process -Id 37528 -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,Path,StartTime\" 2>&1)",
-      "Bash(powershell -NoProfile -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=37528' | Select-Object ProcessId,CommandLine\" 2>&1)",
-      "PowerShell(Get-Process *)",
-      "PowerShell(Get-CimInstance *)"
     ],
     "deny": [],
     "ask": []
