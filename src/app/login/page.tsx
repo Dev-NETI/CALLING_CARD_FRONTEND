@@ -3,9 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 
-const MICROSOFT_URL =
-  process.env.NEXT_PUBLIC_MICROSOFT_LOGIN_URL ??
-  "https://api-business-card.neti.com.ph/api/auth/microsoft/redirect";
+const MICROSOFT_URL = process.env.NEXT_PUBLIC_MICROSOFT_LOGIN_URL;
 
 export default function LoginPage() {
   const [isMountedState, setIsMountedState] = useState(false);
