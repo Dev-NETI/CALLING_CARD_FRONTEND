@@ -99,7 +99,7 @@ export default function LoginPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              NETI Business Card App
+              E-Business Card
             </motion.h1>
 
             <motion.p
