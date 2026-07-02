@@ -33,9 +33,15 @@ export type CardElementType = "text" | "logo" | "qr" | "cert_logo" | "shape";
 interface BaseCardElement {
   id: string;
   type: CardElementType;
-  x: number; // 0–100, % from left edge of card
+  x: number; // 0–100, % — meaning depends on align: left edge / center / right edge
   y: number; // 0–100, % from top edge of card
 }
+
+// Horizontal alignment anchor: which point of the element sits at x%.
+// "left" (default) = element's left edge, "center" = element's horizontal
+// center, "right" = element's right edge — lets an element stay visually
+// aligned to that anchor regardless of its rendered width or text length.
+export type HorizontalAlign = "left" | "center" | "right";
 
 export interface TextCardElement extends BaseCardElement {
   type: "text";
@@ -47,12 +53,17 @@ export interface TextCardElement extends BaseCardElement {
   font_family: string;
   text_align: "left" | "center" | "right";
   uppercase: boolean;
+  width?: number;       // vw value — wraps text to a fixed box instead of
+                         // auto-sizing to content, so long real data (e.g. a
+                         // long department name) wraps predictably instead of
+                         // growing past where it was positioned in the editor
 }
 
 export interface LogoCardElement extends BaseCardElement {
   type: "logo";
   width: number; // vw value
   src?: string;  // uploaded image as data URL; if absent, uses company logo
+  align?: HorizontalAlign;
 }
 
 export interface QRCardElement extends BaseCardElement {
@@ -60,6 +71,7 @@ export interface QRCardElement extends BaseCardElement {
   url: string;
   label: string;
   size: number; // vw value
+  align?: HorizontalAlign;
 }
 
 export interface CertLogoCardElement extends BaseCardElement {
@@ -67,6 +79,7 @@ export interface CertLogoCardElement extends BaseCardElement {
   filename: string; // fallback: /public/assets/certifications/<filename>
   src?: string;     // uploaded image as data URL (takes priority over filename)
   width: number;    // vw value
+  align?: HorizontalAlign;
 }
 
 export interface ShapeCardElement extends BaseCardElement {
@@ -78,6 +91,7 @@ export interface ShapeCardElement extends BaseCardElement {
   border_color: string;
   border_width: number; // px
   opacity: number;      // 0–100
+  align?: HorizontalAlign;
 }
 
 export type CardElement =
@@ -123,10 +137,7 @@ export const CARD_VARIABLES: { key: string; label: string }[] = [
   { key: "{{company_website}}", label: "Company Website" },
 ];
 
-export function resolveTemplate(
-  template: string,
-  employee: Employee,
-): string {
+function templateVariableValues(employee: Employee): Record<string, string> {
   const middleInitial = employee.middle_name
     ? employee.middle_name.charAt(0) + "."
     : "";
@@ -134,22 +145,43 @@ export function resolveTemplate(
     .filter(Boolean)
     .join(" ");
 
+  return {
+    first_name: employee.first_name,
+    middle_name: employee.middle_name ?? "",
+    middle_initial: middleInitial,
+    last_name: employee.last_name,
+    full_name: fullName,
+    department: employee.department ?? "",
+    position: employee.position,
+    email: employee.email,
+    mobile_number: employee.mobile_number ?? "",
+    telephone: employee.telephone ?? "",
+    company_name: employee.company?.company_name ?? "",
+    company_address: employee.company?.company_address ?? "",
+    company_telephone: employee.company?.company_telephone ?? "",
+    company_website: employee.company?.company_website ?? "",
+  };
+}
+
+export function resolveTemplate(
+  template: string,
+  employee: Employee,
+): string {
+  const values = templateVariableValues(employee);
   return template
-    .replace(/\{\{first_name\}\}/g, employee.first_name)
-    .replace(/\{\{middle_name\}\}/g, employee.middle_name ?? "")
-    .replace(/\{\{middle_initial\}\}/g, middleInitial)
-    .replace(/\{\{last_name\}\}/g, employee.last_name)
-    .replace(/\{\{full_name\}\}/g, fullName)
-    .replace(/\{\{department\}\}/g, employee.department ?? "")
-    .replace(/\{\{position\}\}/g, employee.position)
-    .replace(/\{\{email\}\}/g, employee.email)
-    .replace(/\{\{mobile_number\}\}/g, employee.mobile_number ?? "")
-    .replace(/\{\{telephone\}\}/g, employee.telephone ?? "")
-    .replace(/\{\{company_name\}\}/g, employee.company?.company_name ?? "")
-    .replace(/\{\{company_address\}\}/g, employee.company?.company_address ?? "")
-    .replace(/\{\{company_telephone\}\}/g, employee.company?.company_telephone ?? "")
-    .replace(/\{\{company_website\}\}/g, employee.company?.company_website ?? "")
+    .replace(/\{\{(\w+)\}\}/g, (match, key) => values[key] ?? match)
     .trim();
+}
+
+// True if the template is static text, or at least one of its {{variable}}
+// placeholders resolves to a non-empty value for this employee. Used to hide
+// contact-info rows (e.g. "Tel. : {{telephone}}") when the underlying field
+// is blank, instead of showing the label with nothing after it.
+export function templateHasData(template: string, employee: Employee): boolean {
+  const matches = [...template.matchAll(/\{\{(\w+)\}\}/g)];
+  if (matches.length === 0) return true;
+  const values = templateVariableValues(employee);
+  return matches.some((m) => (values[m[1]] ?? "").trim() !== "");
 }
 
 // ── Company / Employee types ──────────────────────────────────────────────────

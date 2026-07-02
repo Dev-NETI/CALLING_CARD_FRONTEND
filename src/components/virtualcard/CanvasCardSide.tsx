@@ -10,13 +10,32 @@ import {
   QRCardElement,
   CertLogoCardElement,
   ShapeCardElement,
+  HorizontalAlign,
   Employee,
   resolveTemplate,
+  templateHasData,
 } from "@/types";
 
 // ── Shared element renderer ───────────────────────────────────────────────────
 // All sizes use cqw (container query width) so elements scale with the card's
 // actual rendered width, not the viewport — keeping editor and card page identical.
+
+// x% marks the left edge / center / right edge of an element depending on its
+// align setting; this shifts the (always left-anchored) box to match so the
+// chosen anchor point stays put regardless of the element's rendered width.
+// Applied to the positioning wrapper (not the inner content) so drag handles
+// and selection rings stay in sync with where the element actually renders.
+export function anchorTransform(align: HorizontalAlign | undefined): string {
+  if (align === "center") return "translateX(-50%)";
+  if (align === "right") return "translateX(-100%)";
+  return "none";
+}
+
+// The alignment anchor for any element type — text elements repurpose their
+// existing text_align, everything else uses the dedicated align field.
+export function getElementAlign(el: CardElement): HorizontalAlign | undefined {
+  return el.type === "text" ? el.text_align : el.align;
+}
 
 export function renderCardElement(
   element: CardElement,
@@ -25,6 +44,7 @@ export function renderCardElement(
   switch (element.type) {
     case "text": {
       const el = element as TextCardElement;
+      if (!templateHasData(el.template, employee)) return null;
       const text = resolveTemplate(el.template, employee) || el.label || "…";
       return (
         <p
@@ -38,6 +58,9 @@ export function renderCardElement(
             lineHeight: 1.25,
             margin: 0,
             whiteSpace: "pre-wrap",
+            width: el.width ? `${el.width}cqw` : undefined,
+            maxWidth: el.width ? `${el.width}cqw` : "94cqw",
+            overflowWrap: "break-word",
           }}
         >
           {text}
@@ -54,7 +77,7 @@ export function renderCardElement(
       return (
         <div
           className="relative"
-          style={{ width: `clamp(2rem, ${el.width}cqw, 15rem)`, aspectRatio: "2 / 1" }}
+          style={{ width: `${el.width}cqw`, aspectRatio: "2 / 1" }}
         >
           <Image
             src={logoSrc}
@@ -82,7 +105,7 @@ export function renderCardElement(
           <QRCodeSVG
             value={el.url}
             size={100}
-            style={{ width: `clamp(2rem, ${el.size}cqw, 8rem)`, height: "auto" }}
+            style={{ width: `${el.size}cqw`, height: "auto" }}
           />
           {el.label && (
             <p
@@ -109,7 +132,7 @@ export function renderCardElement(
       return (
         <div
           className="relative"
-          style={{ width: `clamp(2rem, ${el.width}cqw, 8rem)`, aspectRatio: "1 / 1" }}
+          style={{ width: `${el.width}cqw`, aspectRatio: "1 / 1" }}
         >
           <Image
             src={certSrc}
@@ -261,6 +284,7 @@ export default function CanvasCardSide({
               style={{
                 left: `${el.x}%`,
                 top: `${el.y}%`,
+                transform: anchorTransform(getElementAlign(el)),
                 cursor: editable ? "move" : "default",
                 userSelect: "none",
                 touchAction: "none",

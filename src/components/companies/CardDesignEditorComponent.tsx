@@ -11,6 +11,7 @@ import {
   QRCardElement,
   CertLogoCardElement,
   ShapeCardElement,
+  HorizontalAlign,
   Employee,
   CARD_VARIABLES,
 } from "@/types";
@@ -70,15 +71,15 @@ function defaultTextElement(fontFamily: string): TextCardElement {
 }
 
 function defaultLogoElement(): LogoCardElement {
-  return { id: genId(), type: "logo", x: 25, y: 3, width: 20 };
+  return { id: genId(), type: "logo", x: 25, y: 3, width: 20, align: "left" };
 }
 
 function defaultQRElement(): QRCardElement {
-  return { id: genId(), type: "qr", x: 5, y: 35, url: "", label: "", size: 10 };
+  return { id: genId(), type: "qr", x: 5, y: 35, url: "", label: "", size: 10, align: "left" };
 }
 
 function defaultCertLogoElement(): CertLogoCardElement {
-  return { id: genId(), type: "cert_logo", x: 10, y: 72, filename: "", width: 10 };
+  return { id: genId(), type: "cert_logo", x: 10, y: 72, filename: "", width: 10, align: "left" };
 }
 
 function defaultShapeElement(): ShapeCardElement {
@@ -94,6 +95,7 @@ function defaultShapeElement(): ShapeCardElement {
     border_color: "#000000",
     border_width: 0,
     opacity: 100,
+    align: "left",
   };
 }
 
@@ -535,26 +537,38 @@ function TextElementProperties({
         </label>
       </div>
 
+      {/* Text width — keeps long real data (e.g. a long job title) wrapping
+          inside a fixed box instead of growing past its designed position */}
+      <div>
+        <label className="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer mb-2">
+          <input
+            type="checkbox"
+            checked={el.width != null}
+            onChange={(e) => onChange({ width: e.target.checked ? 40 : undefined })}
+            className="accent-blue-600"
+          />
+          Constrain Width (wrap long text)
+        </label>
+        {el.width != null && (
+          <SliderWithInput
+            label="Max Width"
+            value={el.width}
+            min={5}
+            max={94}
+            sliderStep={1}
+            inputStep={1}
+            unit="vw"
+            onChange={(v) => onChange({ width: v })}
+          />
+        )}
+      </div>
+
       {/* Alignment */}
       <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1.5">
-          Alignment
-        </label>
-        <div className="flex gap-1">
-          {(["left", "center", "right"] as const).map((a) => (
-            <button
-              key={a}
-              onClick={() => onChange({ text_align: a })}
-              className={`flex-1 py-1.5 text-xs rounded-lg border transition-colors capitalize ${
-                el.text_align === a
-                  ? "border-blue-500 bg-blue-50 text-blue-700 font-semibold"
-                  : "border-gray-200 text-gray-500 hover:border-gray-300"
-              }`}
-            >
-              {a}
-            </button>
-          ))}
-        </div>
+        <AlignmentButtons
+          align={el.text_align}
+          onChange={(text_align) => onChange({ text_align })}
+        />
       </div>
     </div>
   );
@@ -631,6 +645,9 @@ function LogoElementProperties({
           className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600"
         />
       </div>
+
+      {/* Alignment */}
+      <AlignmentButtons align={el.align} onChange={(align) => onChange({ align })} />
     </div>
   );
 }
@@ -683,6 +700,9 @@ function QRElementProperties({
           className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600"
         />
       </div>
+
+      {/* Alignment */}
+      <AlignmentButtons align={el.align} onChange={(align) => onChange({ align })} />
     </div>
   );
 }
@@ -771,6 +791,43 @@ function CertLogoElementProperties({
           onChange={(e) => onChange({ width: parseFloat(e.target.value) })}
           className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600"
         />
+      </div>
+
+      {/* Alignment */}
+      <AlignmentButtons align={el.align} onChange={(align) => onChange({ align })} />
+    </div>
+  );
+}
+
+// Which point of the element (left edge / center / right edge) sits at its
+// stored x% — lets it stay visually aligned to that anchor no matter how
+// wide it renders (e.g. a long real name vs. the short preview sample text).
+function AlignmentButtons({
+  align,
+  onChange,
+}: {
+  align: HorizontalAlign | undefined;
+  onChange: (align: HorizontalAlign) => void;
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-medium text-gray-500 mb-1.5">
+        Alignment
+      </label>
+      <div className="flex gap-1">
+        {(["left", "center", "right"] as const).map((a) => (
+          <button
+            key={a}
+            onClick={() => onChange(a)}
+            className={`flex-1 py-1.5 text-xs rounded-lg border transition-colors capitalize ${
+              (align ?? "left") === a
+                ? "border-blue-500 bg-blue-50 text-blue-700 font-semibold"
+                : "border-gray-200 text-gray-500 hover:border-gray-300"
+            }`}
+          >
+            {a === "center" ? "Middle" : a}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -946,6 +1003,9 @@ function ShapeElementProperties({
         unit="%"
         onChange={(v) => onChange({ opacity: v })}
       />
+
+      {/* Alignment */}
+      <AlignmentButtons align={el.align} onChange={(align) => onChange({ align })} />
     </div>
   );
 }

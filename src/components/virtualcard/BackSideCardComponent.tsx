@@ -3,7 +3,7 @@
 import { forwardRef } from "react";
 import Image from "next/image";
 import { Employee, CardDesign } from "@/types";
-import { renderCardElement } from "./CanvasCardSide";
+import { renderCardElement, anchorTransform, getElementAlign } from "./CanvasCardSide";
 
 interface BackSideCardComponentProps {
   employee: Employee;
@@ -37,7 +37,11 @@ const BackSideCardComponent = forwardRef<
           <div
             key={el.id}
             className="absolute"
-            style={{ left: `${el.x}%`, top: `${el.y}%` }}
+            style={{
+              left: `${el.x}%`,
+              top: `${el.y}%`,
+              transform: anchorTransform(getElementAlign(el)),
+            }}
           >
             {renderCardElement(el, employee)}
           </div>
