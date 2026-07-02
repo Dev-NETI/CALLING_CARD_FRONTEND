@@ -1,6 +1,6 @@
 services:
   nextjs:
-    build: .
+    build: https://github.com/Dev-NETI/CALLING_CARD_FRONTEND.git
     container_name: business-card
     restart: unless-stopped
     ports:
